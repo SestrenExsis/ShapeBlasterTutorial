@@ -8,7 +8,7 @@ package
 		
 		public var speed:Number = 480;
 		public var bulletSpeed:Number = 660;
-		public var cooldown:Number = 0.1;
+		public var cooldown:Number = 0.075;
 		protected var _position:FlxPoint;
 		protected var aim:FlxPoint;
 		protected var cooldownTimer:FlxTimer;
@@ -64,13 +64,16 @@ package
 			cooldownTimer.stop();
 			cooldownTimer.start(cooldown);
 			
-			var RandomSpread:Number = 0.08 * (FlxG.random() + FlxG.random()) - 0.08;
+			var RandomSpread:Number = 4.58366236 * (FlxG.random() + FlxG.random()) - 4.58366236;
+			
 			if (GameInput.aimWithMouse)
 			{
 				Aim.x -= x;
 				Aim.y -= y;
+				Aim.y *= -1;
 			}
-			else Aim = FlxU.rotatePoint(Aim.x, Aim.y, 0, 0, toDegrees(RandomSpread));
+			
+			FlxU.rotatePoint(Aim.x, Aim.y, 0, 0, RandomSpread, Aim);
 			
 			var Angle:Number = angleInDegrees(Aim);
 			FlxU.rotatePoint(8, 25, 0, 0, Angle + 90, _point);
@@ -94,7 +97,7 @@ package
 		
 		public static function toDegrees(AngleInRadians:Number):Number
 		{
-			return AngleInRadians * Math.PI / 180;
+			return (AngleInRadians * Math.PI) / 180;
 		}
 		
 		public static function angleInDegrees(Vector:FlxPoint):Number

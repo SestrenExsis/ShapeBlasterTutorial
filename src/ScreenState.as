@@ -15,7 +15,7 @@ package
 			
 			entities = new FlxGroup();
 			entities.add(new PlayerShip());
-			for (var i:uint = 0; i < 25; i++)
+			for (var i:uint = 0; i < 50; i++)
 			{
 				entities.add(new Bullet());
 			}
