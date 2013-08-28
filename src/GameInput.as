@@ -63,8 +63,8 @@ package
 			{
 				if (FlxG.keys["LEFT"]) _aim.x -= 1;
 				if (FlxG.keys["RIGHT"]) _aim.x += 1;
-				if (FlxG.keys["UP"]) _aim.y -= 1;
-				if (FlxG.keys["DOWN"]) _aim.y += 1;
+				if (FlxG.keys["UP"]) _aim.y += 1;
+				if (FlxG.keys["DOWN"]) _aim.y -= 1;
 				
 				return normalize(_aim);
 			}

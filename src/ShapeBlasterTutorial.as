@@ -9,6 +9,7 @@ package
 		{
 			super(640, 480, ScreenState, 1.0, 60, 60, true);
 			forceDebugger = true;
+			useSystemCursor = false;
 		}
 	}
 }

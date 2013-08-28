@@ -7,6 +7,7 @@ package
 		[Embed(source="../assets/images/Player.png")] protected static var imgPlayer:Class;
 		
 		public var speed:Number = 480;
+		public var bulletSpeed:Number = 660;
 		public var cooldown:Number = 0.1;
 		protected var _position:FlxPoint;
 		protected var aim:FlxPoint;
@@ -64,20 +65,23 @@ package
 			cooldownTimer.start(cooldown);
 			
 			var RandomSpread:Number = 0.08 * (FlxG.random() + FlxG.random()) - 0.08;
-			Aim = FlxU.rotatePoint(Aim.x, Aim.y, 0, 0, toDegrees(RandomSpread));
+			if (GameInput.aimWithMouse)
+			{
+				Aim.x -= x;
+				Aim.y -= y;
+			}
+			else Aim = FlxU.rotatePoint(Aim.x, Aim.y, 0, 0, toDegrees(RandomSpread));
 			
-			//var BulletPosition:FlxPoint = new FlxPoint();
-			_point = FlxU.rotatePoint(8, 25, 0, 0, angleInDegrees(Aim));
+			var Angle:Number = angleInDegrees(Aim);
+			FlxU.rotatePoint(8, 25, 0, 0, Angle + 90, _point);
 			var PositionX:Number = _point.x + position.x;
 			var PositionY:Number = _point.y + position.y;
-			var VelocityX:Number = 660 * Aim.x;
-			var VelocityY:Number = 660 * Aim.y;
-			ScreenState.makeBullet(PositionX, PositionY, VelocityX, VelocityY);
+			ScreenState.makeBullet(PositionX, PositionY, Angle, bulletSpeed);
 			
-			_point = FlxU.rotatePoint(-8, 25, 0, 0, angleInDegrees(Aim));
-			PositionX = _point.x;
-			PositionY = _point.y;
-			ScreenState.makeBullet(PositionX, PositionY, VelocityX, VelocityY);
+			FlxU.rotatePoint(-8, 25, 0, 0, Angle + 90, _point);
+			PositionX = _point.x + position.x;
+			PositionY = _point.y + position.y;
+			ScreenState.makeBullet(PositionX, PositionY, Angle, bulletSpeed);
 		}
 		
 		public function get position():FlxPoint
@@ -96,7 +100,7 @@ package
 		public static function angleInDegrees(Vector:FlxPoint):Number
 		{
 			var _angleInRadians:Number = Math.atan2(Vector.y, Vector.x);
-			return _angleInRadians / Math.PI * 180;
+			return (_angleInRadians / Math.PI) * 180;
 		}
 		
 		public static function angleInRadians(Vector:FlxPoint):Number

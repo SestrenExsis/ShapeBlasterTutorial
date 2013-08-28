@@ -22,6 +22,8 @@ package
 		override public function update():void
 		{
 			super.update();
+			
+			if (!onScreen()) kill();
 		}
 		
 		override public function destroy():void
