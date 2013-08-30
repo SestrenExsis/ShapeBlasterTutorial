@@ -8,10 +8,9 @@ package
 		
 		public var speed:Number = 480;
 		public var bulletSpeed:Number = 660;
-		public var cooldown:Number = 0.075;
-		protected var _position:FlxPoint;
 		protected var aim:FlxPoint;
-		protected var cooldownTimer:FlxTimer;
+		
+		public static var instance:PlayerShip;
 
 		public function PlayerShip()
 		{
@@ -19,10 +18,8 @@ package
 			
 			loadRotatedGraphic(imgPlayer, 8, -1, true, true);
 			radius = 10;
-			_position = new FlxPoint();
 			aim = new FlxPoint();
-			cooldownTimer = new FlxTimer();
-			cooldownTimer.start(0.001);
+			instance = this;
 		}
 		
 		override public function draw():void
@@ -85,14 +82,6 @@ package
 			PositionX = _point.x + position.x;
 			PositionY = _point.y + position.y;
 			ScreenState.makeBullet(PositionX, PositionY, Angle, bulletSpeed);
-		}
-		
-		public function get position():FlxPoint
-		{
-			_position.x = x + radius;
-			_position.y = y + radius;
-			
-			return _position;
 		}
 		
 		public static function toDegrees(AngleInRadians:Number):Number
