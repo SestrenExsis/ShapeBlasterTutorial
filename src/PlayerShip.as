@@ -44,16 +44,32 @@ package
 		{
 			super.postUpdate();
 			
-			//clamp the position to be within the bounds of the screen
-			if (x < 0) x = 0;
-			else if (x + width > FlxG.width) x = FlxG.width - width;
-			if (y < 0) y = 0;
-			else if (y + height > FlxG.height) y = FlxG.height - height;
+			clampToScreen();
 		}
 		
 		override public function destroy():void
 		{
 			super.destroy();
+		}
+		
+		override public function kill():void
+		{
+			super.kill();
+			cooldownTimer.stop();
+			cooldownTimer.start(1, 1, onTimerReset);
+		}
+		
+		public function onTimerReset(Timer:FlxTimer):void
+		{
+			reset(0.5 * FlxG.width, 0.5 * FlxG.height);
+		}
+		
+		override public function reset(X:Number, Y:Number):void
+		{
+			super.reset(X - 0.5 * width, Y - 0.5 * height);
+			
+			cooldownTimer.stop();
+			cooldownTimer.finished = true;
 		}
 		
 		override public function collidesWith(Object:FlxObject):void

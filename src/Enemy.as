@@ -31,12 +31,19 @@ package
 			}
 			else
 			{
-				color = FlxG.WHITE * (1 - cooldownTimer.timeLeft / 60);
+				alpha = (1 - cooldownTimer.timeLeft / cooldownTimer.time);
 			}
 			
 			//gradually build up speed
 			velocity.x *= 0.8;
 			velocity.y *= 0.8;
+		}
+		
+		override public function postUpdate():void
+		{
+			super.postUpdate();
+			
+			clampToScreen();
 		}
 		
 		override public function destroy():void
@@ -59,9 +66,11 @@ package
 		
 		override public function reset(X:Number, Y:Number):void
 		{
-			super.reset(X, Y);
+			alpha = 0;
+			super.reset(X - 0.5 * width, Y - 0.5 * height);
+			
 			cooldownTimer.stop();
-			cooldownTimer.start(5);
+			cooldownTimer.start(1);
 		}
 		
 		private function applyBehaviors():void
