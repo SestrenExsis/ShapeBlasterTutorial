@@ -1,10 +1,11 @@
 package
 {
-	import org.flixel.*;
-	import flash.geom.Rectangle;
-	import flash.filters.BlurFilter;
 	import flash.filters.BitmapFilterQuality;
+	import flash.filters.BlurFilter;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	
+	import org.flixel.*;
 	
 	public class ScreenState extends FlxState
 	{
@@ -52,6 +53,8 @@ package
 			super.update();
 			cursor.x = FlxG.mouse.x;
 			cursor.y = FlxG.mouse.y;
+			
+			FlxG.overlap(entities, entities, handleCollision, circularCollision);
 		}
 		
 		override public function draw():void
@@ -61,6 +64,24 @@ package
 			_fx.stamp(FlxG.camera.screen);
 			FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, new Rectangle(0,0,FlxG.width,FlxG.height), new Point(0,0), blur);
 			_fx.draw();
+		}
+		
+		public function handleCollision(Object1:FlxObject, Object2:FlxObject):void
+		{
+			(Object1 as Entity).collidesWith(Object2);
+			(Object2 as Entity).collidesWith(Object1);
+		}
+		
+		public function circularCollision(Object1:FlxObject, Object2:FlxObject):Boolean
+		{
+			var _distanceFromCenters:Number
+			if (Object1 is Entity && Object2 is Entity)
+			{
+				_distanceFromCenters = FlxU.getDistance((Object1 as Entity).position, (Object2 as Entity).position);
+				if (_distanceFromCenters < (Object1 as Entity).radius + (Object2 as Entity).radius) return true;
+				else return false;
+			}
+			else return false;
 		}
 		
 		public static function makeBullet(PositionX:Number, PositionY:Number, Angle:Number, Speed:Number):Boolean

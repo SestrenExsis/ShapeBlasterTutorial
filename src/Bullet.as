@@ -30,5 +30,10 @@ package
 		{
 			super.destroy();
 		}
+		
+		override public function collidesWith(Object:FlxObject):void
+		{
+			if (Object is Enemy) kill();
+		}
 	}
 }

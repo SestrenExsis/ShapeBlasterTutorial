@@ -34,6 +34,11 @@ package
 			super.destroy();
 		}
 		
+		public function collidesWith(Object:FlxObject):void
+		{
+			
+		}
+		
 		public function get position():FlxPoint
 		{
 			_position.x = x + radius;

@@ -13,7 +13,7 @@ package
 			loadRotatedGraphic(imgEnemy, 360, -1, true, true);
 			radius = 10;
 			
-			//kill();
+			kill();
 		}
 		
 		override public function draw():void
@@ -44,19 +44,32 @@ package
 			super.destroy();
 		}
 		
+		override public function collidesWith(Object:FlxObject):void
+		{
+			if (Object is Bullet) kill();
+			else if (Object is Enemy)
+			{
+				var VelocityX:Number = position.x - (Object as Entity).position.x;
+				var VelocityY:Number = position.y - (Object as Entity).position.y;
+				var DistanceSquared:Number = VelocityX * VelocityX + VelocityY * VelocityY;
+				velocity.x += 600 * VelocityX / (DistanceSquared + 1);
+				velocity.y += 600 * VelocityY / (DistanceSquared + 1);
+			}
+		}
+		
 		override public function reset(X:Number, Y:Number):void
 		{
 			super.reset(X, Y);
-			
-			cooldownTimer.start(1);
+			cooldownTimer.stop();
+			cooldownTimer.start(5);
 		}
 		
 		private function applyBehaviors():void
 		{
-			followPlayer(10);//behavior logic goes here
+			followPlayer();//behavior logic goes here
 		}
 		
-		private function followPlayer(Acceleration:Number = 60):void
+		private function followPlayer(Acceleration:Number = 30):void
 		{
 			if (PlayerShip.instance.alive) 
 			{

@@ -56,6 +56,11 @@ package
 			super.destroy();
 		}
 		
+		override public function collidesWith(Object:FlxObject):void
+		{
+			if (Object is Enemy) kill();
+		}
+		
 		public function shoot(Aim:FlxPoint):void
 		{
 			cooldownTimer.stop();
