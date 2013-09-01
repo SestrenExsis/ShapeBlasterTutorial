@@ -7,6 +7,7 @@ package
 		public var radius:Number = 0;
 		protected var cooldownTimer:FlxTimer;
 		protected var _position:FlxPoint;
+		protected var hitEdgeOfScreen:Boolean = false;
 		public var cooldown:Number = 0.075;
 		
 		public function Entity(X:Number = 0, Y:Number = 0)

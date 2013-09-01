@@ -9,8 +9,10 @@ package
 		public function Bullet(X:Number = -1000, Y:Number = -1000)
 		{
 			super(X, Y);
-			
 			loadRotatedGraphic(imgBullet, 360, -1, true, true);
+			radius = 10;
+			width = height = 28;
+			offset.y = 0.5 * (28 - 9);
 			kill();
 		}
 		

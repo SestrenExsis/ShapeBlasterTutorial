@@ -62,6 +62,7 @@ package
 		public function onTimerReset(Timer:FlxTimer):void
 		{
 			reset(0.5 * FlxG.width, 0.5 * FlxG.height);
+			ScreenState.reset();
 		}
 		
 		override public function reset(X:Number, Y:Number):void

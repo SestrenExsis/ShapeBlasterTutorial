@@ -15,7 +15,7 @@ package
 		private static var cursor:FlxSprite;
 		private var _fx:FlxSprite;
 		private var blur:BlurFilter;
-		private var inverseSpawnChance:Number = 60;
+		private static var inverseSpawnChance:Number = 60;
 		private static var _spawnPosition:FlxPoint;
 		
 		public function ScreenState()
@@ -56,7 +56,9 @@ package
 			cursor.x = FlxG.mouse.x;
 			cursor.y = FlxG.mouse.y;
 			
-			if (FlxG.random() < 1 / inverseSpawnChance) makeSeeker()
+			if (FlxG.random() < 1 / inverseSpawnChance) makeSeeker();
+			if (FlxG.random() < 1 / inverseSpawnChance) makeWanderer();
+			if (inverseSpawnChance > 20) inverseSpawnChance -= 0.005;
 			
 			FlxG.overlap(entities, entities, handleCollision, circularCollision);
 		}
@@ -88,6 +90,11 @@ package
 			else return false;
 		}
 		
+		public static function reset():void
+		{
+			inverseSpawnChance = 60;
+		}
+		
 		public static function makeBullet(PositionX:Number, PositionY:Number, Angle:Number, Speed:Number):Boolean
 		{
 			var bullet:Bullet = Bullet(entities.getFirstAvailable(Bullet));
@@ -107,8 +114,22 @@ package
 			var seeker:Enemy = Enemy(entities.getFirstAvailable(Enemy));
 			if (seeker) 
 			{
+				seeker.type = Enemy.SEEKER;
 				seeker.position = getSpawnPosition(seeker.position);
 				seeker.reset(seeker.position.x, seeker.position.y);
+				return true;
+			}
+			else return false;
+		}
+		
+		public static function makeWanderer():Boolean
+		{
+			var wanderer:Enemy = Enemy(entities.getFirstAvailable(Enemy));
+			if (wanderer)
+			{
+				wanderer.type = Enemy.WANDERER;
+				wanderer.position = getSpawnPosition(wanderer.position);
+				wanderer.reset(wanderer.position.x, wanderer.position.y);
 				return true;
 			}
 			else return false;
