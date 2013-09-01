@@ -13,7 +13,7 @@ package
 		[Embed(source="../assets/images/Wanderer.png")] protected static var imgWanderer:Class;
 		
 		private var enemyPixels:Array = new Array();
-		
+		private var pointValue:int;
 		protected var _type:uint;
 
 		public function Enemy(X:Number = 0, Y:Number = 0, Type:uint = 0)
@@ -66,6 +66,13 @@ package
 		override public function destroy():void
 		{
 			super.destroy();
+		}
+		
+		override public function kill():void
+		{
+			PlayerShip.addPoints(pointValue);
+			PlayerShip.increaseMultiplier();
+			super.kill();
 		}
 		
 		public function get type():uint

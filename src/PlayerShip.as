@@ -6,6 +6,17 @@ package
 	{
 		[Embed(source="../assets/images/Player.png")] protected static var imgPlayer:Class;
 		
+		private static const MULTIPLIER_EXPIRY_TIME:Number = 0.8; // amount of time it takes, in seconds, for a multiplier to expire.
+		private static const MULTIPLIER_MAX:int = 20;
+		
+		public static var lives:int;
+		public static var score:int;
+		public static var highScore:int;
+		public static var multiplier:int;
+		
+		private static var multiplierTimeLeft:Number; // time until the current multiplier expires
+		private static var scoreForExtraLife:int; // score required to gain an extra life
+		
 		public var speed:Number = 480;
 		public var bulletSpeed:Number = 660;
 		protected var aim:FlxPoint;
@@ -30,6 +41,16 @@ package
 		override public function update():void
 		{
 			super.update();
+			
+			if (multiplier > 1)
+			{
+				// update the multiplier timer
+				if ((multiplierTimeLeft -= FlxG.elapsed) <= 0)
+				{
+					multiplierTimeLeft = MULTIPLIER_EXPIRY_TIME;
+					resetMultiplier();
+				}
+			}
 			
 			velocity = GameInput.move;
 			velocity.x *= speed;
@@ -56,7 +77,14 @@ package
 		{
 			super.kill();
 			cooldownTimer.stop();
-			cooldownTimer.start(1, 1, onTimerReset);
+			if (lives-- < 0) cooldownTimer.start(1, 1, onTimerRestart);
+			else cooldownTimer.start(1, 1, onTimerReset);
+		}
+		
+		public function onTimerRestart(Timer:FlxTimer):void
+		{
+			restart();
+			ScreenState.reset();
 		}
 		
 		public function onTimerReset(Timer:FlxTimer):void
@@ -71,6 +99,17 @@ package
 			
 			cooldownTimer.stop();
 			cooldownTimer.finished = true;
+		}
+		
+		public function restart():void
+		{
+			reset(0.5 *FlxG.width, 0.5 *FlxG.height);
+			
+			score = 0;
+			multiplier = 1;
+			lives = 4;
+			scoreForExtraLife = 2000;
+			multiplierTimeLeft = 0;
 		}
 		
 		override public function collidesWith(Object:FlxObject):void
@@ -104,6 +143,32 @@ package
 			PositionX = _point.x + position.x;
 			PositionY = _point.y + position.y;
 			ScreenState.makeBullet(PositionX, PositionY, Angle, bulletSpeed);
+		}
+		
+		public function resetMultiplier():void
+		{
+			multiplier = 1;
+		}
+		
+		public static function addPoints(BasePoints:int):void
+		{
+			if (!instance.alive) return;
+			
+			score += BasePoints * multiplier;
+			while (score >= scoreForExtraLife)
+			{
+				scoreForExtraLife += 2000;
+				lives++;
+			}
+			if (score > UserSettings.highScore) UserSettings.highScore = score;
+		}
+		
+		public static function increaseMultiplier():void
+		{
+			if (!instance.alive) return;
+			
+			multiplierTimeLeft = MULTIPLIER_EXPIRY_TIME;
+			if (multiplier < MULTIPLIER_MAX) multiplier++;
 		}
 		
 		public static function toDegrees(AngleInRadians:Number):Number

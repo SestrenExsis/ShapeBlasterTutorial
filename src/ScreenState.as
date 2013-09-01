@@ -10,9 +10,11 @@ package
 	public class ScreenState extends FlxState
 	{
 		[Embed(source="../assets/images/Pointer.png")] protected static var imgPointer:Class;
+		//[Embed(source="http://fonts.googleapis.com/css?family=Nova+Square", fontFamily="Nova Square", embedAsCFF="false")] public var fntNovaSquare:String;
 
 		private static var entities:FlxGroup;
 		private static var cursor:FlxSprite;
+		private static var displayText:FlxText;
 		private var _fx:FlxSprite;
 		private var blur:BlurFilter;
 		private static var inverseSpawnChance:Number = 60;
@@ -37,15 +39,16 @@ package
 			cursor.loadGraphic(imgPointer);
 			add(cursor);
 			
+			displayText = new FlxText(0, 0, FlxG.width, "");
+			displayText.setFormat(null, 16, 0xffffff, "right");
+			add(displayText);
+			
 			_fx = new FlxSprite();
 			_fx.makeGraphic(FlxG.width, FlxG.height, 0, true);
-			_fx.antialiasing = true;	//Set AA to true for maximum blurry
-			_fx.blend = "screen";		//Set blend mode to "screen" to make the blurred copy transparent and brightening
+			_fx.antialiasing = true;
+			_fx.blend = "screen";
 			
-			blur = new BlurFilter();
-			blur.blurX = 8; 
-			blur.blurY = 8; 
-			blur.quality = BitmapFilterQuality.HIGH;
+			blur = new BlurFilter(8, 8, BitmapFilterQuality.HIGH);
 		}
 		
 		override public function update():void
@@ -61,6 +64,8 @@ package
 			if (inverseSpawnChance > 20) inverseSpawnChance -= 0.005;
 			
 			FlxG.overlap(entities, entities, handleCollision, circularCollision);
+			
+			displayText.text = "Lives: " + PlayerShip.lives + "\tScore: " + PlayerShip.score + "\tMultiplier: " + PlayerShip.multiplier;
 		}
 		
 		override public function draw():void
