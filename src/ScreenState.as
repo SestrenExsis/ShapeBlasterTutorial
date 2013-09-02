@@ -28,7 +28,9 @@ package
 		override public function create():void
 		{
 			super.create();
-			
+			GameInput.create();
+			GameSound.create();
+						
 			entities = new FlxGroup();
 			entities.add(new PlayerShip());
 			for (var i:uint = 0; i < 50; i++) entities.add(new Bullet());
@@ -65,7 +67,10 @@ package
 			
 			FlxG.overlap(entities, entities, handleCollision, circularCollision);
 			
-			displayText.text = "Lives: " + PlayerShip.lives + "\tScore: " + PlayerShip.score + "\tMultiplier: " + PlayerShip.multiplier;
+			if (PlayerShip.isGameOver) displayText.text = "Game Over\n" + "Your Score: " + 
+				PlayerShip.score + "\n" + "High Score: " + PlayerShip.highScore;
+			else displayText.text = "Lives: " + PlayerShip.lives + "\t\tScore: " + 
+				PlayerShip.score + "\t\tMultiplier: " + PlayerShip.multiplier;
 		}
 		
 		override public function draw():void

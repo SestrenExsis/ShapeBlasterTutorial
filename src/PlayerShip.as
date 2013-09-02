@@ -13,6 +13,7 @@ package
 		public static var score:int;
 		public static var highScore:int;
 		public static var multiplier:int;
+		public static var isGameOver:Boolean = false;
 		
 		private static var multiplierTimeLeft:Number; // time until the current multiplier expires
 		private static var scoreForExtraLife:int; // score required to gain an extra life
@@ -31,6 +32,7 @@ package
 			radius = 10;
 			aim = new FlxPoint();
 			instance = this;
+			UserSettings.load();
 		}
 		
 		override public function draw():void
@@ -77,14 +79,19 @@ package
 		{
 			super.kill();
 			cooldownTimer.stop();
-			if (lives-- < 0) cooldownTimer.start(1, 1, onTimerRestart);
-			else cooldownTimer.start(1, 1, onTimerReset);
+			if (lives-- < 0) 
+			{
+				isGameOver = true;
+				cooldownTimer.start(5, 1, onTimerRestart);
+			}
+			else cooldownTimer.start(2, 1, onTimerReset);
 		}
 		
 		public function onTimerRestart(Timer:FlxTimer):void
 		{
 			restart();
 			ScreenState.reset();
+			isGameOver = false;
 		}
 		
 		public function onTimerReset(Timer:FlxTimer):void
@@ -105,6 +112,7 @@ package
 		{
 			reset(0.5 *FlxG.width, 0.5 *FlxG.height);
 			
+			if (score > UserSettings.highScore) UserSettings.highScore = score;
 			score = 0;
 			multiplier = 1;
 			lives = 4;
@@ -143,6 +151,8 @@ package
 			PositionX = _point.x + position.x;
 			PositionY = _point.y + position.y;
 			ScreenState.makeBullet(PositionX, PositionY, Angle, bulletSpeed);
+			
+			GameSound.randomSound(GameSound.sfxShoot, 0.4);
 		}
 		
 		public function resetMultiplier():void
@@ -160,7 +170,6 @@ package
 				scoreForExtraLife += 2000;
 				lives++;
 			}
-			if (score > UserSettings.highScore) UserSettings.highScore = score;
 		}
 		
 		public static function increaseMultiplier():void

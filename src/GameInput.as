@@ -5,11 +5,18 @@ package
 	
 	public class GameInput
 	{
-		protected static var _move:FlxPoint = new FlxPoint();
-		protected static var _aim:FlxPoint = new FlxPoint();
+		protected static var _move:FlxPoint;
+		protected static var _aim:FlxPoint;
 		protected static var _wasBombButtonPressed:Boolean = false;
-		protected static var _mouseLast:FlxPoint = new FlxPoint();
+		protected static var _mouseLast:FlxPoint;
 		protected static var _aimWithMouse:Boolean = false;
+		
+		public static function create():void
+		{
+			_move = new FlxPoint();
+			_aim = new FlxPoint();
+			_mouseLast = new FlxPoint();
+		}
 		
 		public static function update():void
 		{

@@ -13,7 +13,7 @@ package
 		[Embed(source="../assets/images/Wanderer.png")] protected static var imgWanderer:Class;
 		
 		private var enemyPixels:Array = new Array();
-		private var pointValue:int;
+		private var pointValue:int = 10;
 		protected var _type:uint;
 
 		public function Enemy(X:Number = 0, Y:Number = 0, Type:uint = 0)
@@ -25,9 +25,10 @@ package
 			enemyPixels.push(loadRotatedGraphic(imgWanderer, 360, -1, true, true).pixels);
 			
 			radius = 10;
-			maxVelocity.x = maxVelocity.y = 384;
+			maxVelocity.x = maxVelocity.y = 600;//384;
 			
-			kill();
+			alive = false;
+			exists = false;
 			//have a separate playerCollision radius, a bulletCollision radius, and an enemyCollision radius
 		}
 		
@@ -73,6 +74,7 @@ package
 			PlayerShip.addPoints(pointValue);
 			PlayerShip.increaseMultiplier();
 			super.kill();
+			GameSound.randomSound(GameSound.sfxExplosion, 0.5);
 		}
 		
 		public function get type():uint
@@ -121,7 +123,7 @@ package
 			else if (type == WANDERER) moveRandomly();
 		}
 		
-		private function followPlayer(Acceleration:Number = 30):void
+		private function followPlayer(Acceleration:Number = 10):void
 		{
 			if (PlayerShip.instance.alive) 
 			{
@@ -131,7 +133,7 @@ package
 			}
 		}
 		
-		private function moveRandomly(Acceleration:Number = 180):void
+		private function moveRandomly(Acceleration:Number = 320):void
 		{
 			var _angle:Number;
 			if (hitEdgeOfScreen) 
