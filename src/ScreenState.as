@@ -51,6 +51,7 @@ package
 			_fx.blend = "screen";
 			
 			blur = new BlurFilter(8, 8, BitmapFilterQuality.HIGH);
+			FlxG.watch(Enemy, "blackHoles");
 		}
 		
 		override public function update():void
@@ -61,11 +62,12 @@ package
 			cursor.x = FlxG.mouse.x;
 			cursor.y = FlxG.mouse.y;
 			
-			if (FlxG.random() < 1 / inverseSpawnChance) makeSeeker();
-			if (FlxG.random() < 1 / inverseSpawnChance) makeWanderer();
+			if (FlxG.random() < 1 / inverseSpawnChance) makeEnemy(Enemy.SEEKER);
+			if (FlxG.random() < 1 / inverseSpawnChance) makeEnemy(Enemy.WANDERER);
+			if (Enemy.blackHoles < 2) if (FlxG.random() < 1 / (inverseSpawnChance * 10)) makeEnemy(Enemy.BLACK_HOLE);
 			if (inverseSpawnChance > 20) inverseSpawnChance -= 0.005;
 			
-			FlxG.overlap(entities, entities, handleCollision, circularCollision);
+			FlxG.overlap(entities, entities, handleCollision);
 			
 			if (PlayerShip.isGameOver) displayText.text = "Game Over\n" + "Your Score: " + 
 				PlayerShip.score + "\n" + "High Score: " + PlayerShip.highScore;
@@ -84,11 +86,24 @@ package
 		
 		public function handleCollision(Object1:FlxObject, Object2:FlxObject):void
 		{
-			(Object1 as Entity).collidesWith(Object2);
-			(Object2 as Entity).collidesWith(Object1);
+			var DistanceSquared:Number = 0;
+			var Collided:Boolean = false;
+			if (Object1 is Entity && Object2 is Entity)
+			{
+				var DX:Number = (Object1 as Entity).position.x - (Object2 as Entity).position.x;
+				var DY:Number = (Object1 as Entity).position.y - (Object2 as Entity).position.y;
+				var CombinedRadius:Number = (Object1 as Entity).radius + (Object2 as Entity).radius;
+				
+				DistanceSquared = DX * DX + DY * DY; //FlxU.getDistance((Object1 as Entity).position, (Object2 as Entity).position);
+				if (DistanceSquared <= CombinedRadius * CombinedRadius) Collided = true;
+				else Collided = false;
+			}
+			if (!Collided) return;
+			(Object1 as Entity).collidesWith(Object2 as Entity, DistanceSquared);
+			(Object2 as Entity).collidesWith(Object1 as Entity, DistanceSquared);
 		}
 		
-		public function circularCollision(Object1:FlxObject, Object2:FlxObject):Boolean
+		/*public function circularCollision(Object1:FlxObject, Object2:FlxObject):Boolean
 		{
 			var _distanceFromCenters:Number
 			if (Object1 is Entity && Object2 is Entity)
@@ -98,7 +113,7 @@ package
 				else return false;
 			}
 			else return false;
-		}
+		}*/
 		
 		public static function reset():void
 		{
@@ -119,27 +134,15 @@ package
 			else return false;
 		}
 		
-		public static function makeSeeker():Boolean
+		public static function makeEnemy(Type:uint):Boolean
 		{
-			var seeker:Enemy = Enemy(entities.getFirstAvailable(Enemy));
-			if (seeker) 
+			var _enemy:Enemy = Enemy(entities.getFirstAvailable(Enemy));
+			if (_enemy) 
 			{
-				seeker.type = Enemy.SEEKER;
-				seeker.position = getSpawnPosition(seeker.position);
-				seeker.reset(seeker.position.x, seeker.position.y);
-				return true;
-			}
-			else return false;
-		}
-		
-		public static function makeWanderer():Boolean
-		{
-			var wanderer:Enemy = Enemy(entities.getFirstAvailable(Enemy));
-			if (wanderer)
-			{
-				wanderer.type = Enemy.WANDERER;
-				wanderer.position = getSpawnPosition(wanderer.position);
-				wanderer.reset(wanderer.position.x, wanderer.position.y);
+				if (Type == Enemy.BLACK_HOLE) Enemy.blackHoles += 1;
+				_enemy.type = Type;
+				_enemy.position = getSpawnPosition(_enemy.position);
+				_enemy.reset(_enemy.position.x, _enemy.position.y);
 				return true;
 			}
 			else return false;

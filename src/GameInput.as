@@ -21,7 +21,8 @@ package
 		public static function update():void
 		{
 			//Don't enable aiming with the mouse unless the aiming keys aren't in use and the mouse has moved position
-			if (FlxG.keys["LEFT" || "RIGHT" || "UP" || "DOWN"]) _aimWithMouse = false;
+			if (FlxG.mouse.pressed()) _aimWithMouse = true;
+			else if (FlxG.keys["LEFT" || "RIGHT" || "UP" || "DOWN"]) _aimWithMouse = false;
 			else if ((FlxG.mouse.x == _mouseLast.x) && (FlxG.mouse.y == _mouseLast.y)) _aimWithMouse = false;
 			else _aimWithMouse = true;
 			

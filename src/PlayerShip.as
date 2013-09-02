@@ -29,7 +29,7 @@ package
 			super(0.5 * FlxG.width, 0.5 * FlxG.height);
 			
 			loadRotatedGraphic(imgPlayer, 8, -1, true, true);
-			radius = 10;
+			radius = hitboxRadius = 10;
 			aim = new FlxPoint();
 			instance = this;
 			UserSettings.load();
@@ -120,9 +120,9 @@ package
 			multiplierTimeLeft = 0;
 		}
 		
-		override public function collidesWith(Object:FlxObject):void
+		override public function collidesWith(Object:Entity, Distance:Number):void
 		{
-			if (Object is Enemy) kill();
+			
 		}
 		
 		public function shoot(Aim:FlxPoint):void
@@ -178,22 +178,6 @@ package
 			
 			multiplierTimeLeft = MULTIPLIER_EXPIRY_TIME;
 			if (multiplier < MULTIPLIER_MAX) multiplier++;
-		}
-		
-		public static function toDegrees(AngleInRadians:Number):Number
-		{
-			return (AngleInRadians * Math.PI) / 180;
-		}
-		
-		public static function angleInDegrees(Vector:FlxPoint):Number
-		{
-			var _angleInRadians:Number = Math.atan2(Vector.y, Vector.x);
-			return (_angleInRadians / Math.PI) * 180;
-		}
-		
-		public static function angleInRadians(Vector:FlxPoint):Number
-		{
-			return Math.atan2(Vector.y, Vector.x);
 		}
 		
 		public function setAimFromPolar(Angle:Number, Magnitude:Number):void

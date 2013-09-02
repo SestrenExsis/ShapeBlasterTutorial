@@ -8,23 +8,31 @@ package
 	{
 		public static const SEEKER:uint = 0;
 		public static const WANDERER:uint = 1;
+		public static const BLACK_HOLE:uint = 2;
 		
 		[Embed(source="../assets/images/Seeker.png")] protected static var imgSeeker:Class;
 		[Embed(source="../assets/images/Wanderer.png")] protected static var imgWanderer:Class;
+		[Embed(source="../assets/images/Black Hole.png")] protected static var imgBlackHole:Class;
 		
 		private var enemyPixels:Array = new Array();
 		private var pointValue:int = 10;
 		protected var _type:uint;
+		
+		public static var blackHoles:int = 0;
 
 		public function Enemy(X:Number = 0, Y:Number = 0, Type:uint = 0)
 		{
 			super(FlxG.width * FlxG.random(), FlxG.height * FlxG.random());
 			
-			_type = WANDERER;
+			//_type = WANDERER;
 			enemyPixels.push(loadRotatedGraphic(imgSeeker, 360, -1, true, true).pixels);
 			enemyPixels.push(loadRotatedGraphic(imgWanderer, 360, -1, true, true).pixels);
+			enemyPixels.push(loadRotatedGraphic(imgBlackHole, 360, -1, true, true).pixels);
+			_pixels = enemyPixels[SEEKER];
+			_type = SEEKER;
 			
 			radius = 10;
+			hitboxRadius = 10;
 			maxVelocity.x = maxVelocity.y = 600;//384;
 			
 			alive = false;
@@ -71,6 +79,8 @@ package
 		
 		override public function kill():void
 		{
+			if (!alive) return;
+			if (type == BLACK_HOLE) blackHoles -= 1;
 			PlayerShip.addPoints(pointValue);
 			PlayerShip.increaseMultiplier();
 			super.kill();
@@ -88,22 +98,83 @@ package
 			_type = Value;
 			if (_previousType != _type)
 			{
-				if (_type == SEEKER) _pixels = enemyPixels[SEEKER];
-				else if (_type == WANDERER) _pixels = enemyPixels[WANDERER];
+				_pixels = enemyPixels[_type];
+				//if (_type == SEEKER) _pixels = enemyPixels[SEEKER];
+				//else if (_type == WANDERER) _pixels = enemyPixels[WANDERER];
+				//else if (_type == BLACK_HOLE) _pixels = enemyPixels[BLACK_HOLE];
 				dirty = true;
 			}
+			switch (_type)
+			{
+				case SEEKER:
+					alpha = 0;
+					health = 1;
+					radius = 10;
+					hitboxRadius = 10;
+					break;
+				case WANDERER:
+					alpha = 0;
+					health = 1;
+					radius = 10;
+					hitboxRadius = 10;
+					break;
+				case BLACK_HOLE:
+					alpha = 1;
+					health = 10;
+					radius = 250;
+					hitboxRadius = 10;
+					break;
+			}
+			width = height = 2 * Math.max(radius, hitboxRadius);
+			centerOffsets();
 		}
 		
-		override public function collidesWith(Object:FlxObject):void
+		override public function collidesWith(Object:Entity, DistanceSquared:Number):void
 		{
-			if (Object is Bullet) kill();
+			var CombinedHitBoxRadius:Number = hitboxRadius + Object.hitboxRadius;
+			var IsHitBoxCollision:Boolean = (CombinedHitBoxRadius * CombinedHitBoxRadius) >= DistanceSquared;
+			var AngleFromCenters:Number = Entity.toRadians(FlxU.getAngle(position, Object.position));
+			if (Object is Bullet) 
+			{
+				if (IsHitBoxCollision) 
+				{
+					Object.kill();
+					hurt(1);
+				}
+				else
+				{
+					if (type == BLACK_HOLE)
+					{
+						
+						Object.velocity.x += 20 * Math.cos(AngleFromCenters);
+						Object.velocity.y += 20 * Math.sin(AngleFromCenters);
+					}
+				}
+			}
 			else if (Object is Enemy)
 			{
-				var VelocityX:Number = position.x - (Object as Entity).position.x;
-				var VelocityY:Number = position.y - (Object as Entity).position.y;
-				var DistanceSquared:Number = VelocityX * VelocityX + VelocityY * VelocityY;
-				velocity.x += 600 * VelocityX / (DistanceSquared + 1);
-				velocity.y += 600 * VelocityY / (DistanceSquared + 1);
+				if (type == BLACK_HOLE && (Object as Enemy).type == BLACK_HOLE) return;
+				
+				if (IsHitBoxCollision) Object.kill();
+				else
+				{
+					if (type == BLACK_HOLE)
+					{
+						//Entity.linearInterpolate(
+					}
+					else
+					{
+						var VelocityX:Number = position.x - Object.position.x;
+						var VelocityY:Number = position.y - Object.position.y;
+						var DistanceSquared:Number = VelocityX * VelocityX + VelocityY * VelocityY;
+						velocity.x += 600 * VelocityX / (DistanceSquared + 1);
+						velocity.y += 600 * VelocityY / (DistanceSquared + 1);
+					}
+				}
+			}
+			else if (Object is PlayerShip)
+			{
+				if (IsHitBoxCollision) Object.kill();
 			}
 		}
 		
@@ -121,6 +192,7 @@ package
 			//behavior logic goes here
 			if (type == SEEKER) followPlayer();
 			else if (type == WANDERER) moveRandomly();
+			else if (type == BLACK_HOLE) applyGravity();
 		}
 		
 		private function followPlayer(Acceleration:Number = 10):void
@@ -129,7 +201,7 @@ package
 			{
 				acceleration.x = Acceleration * (PlayerShip.instance.position.x - position.x);
 				acceleration.y = Acceleration * (PlayerShip.instance.position.y - position.y);
-				angle = PlayerShip.angleInDegrees(acceleration);
+				angle = Entity.angleInDegrees(acceleration);
 			}
 		}
 		
@@ -154,6 +226,11 @@ package
 			_angle = 2 * Math.PI * FlxG.random();
 			acceleration.x = Acceleration * Math.cos(_angle);
 			acceleration.y = Acceleration * Math.sin(_angle);
+			angularVelocity = 200;
+		}
+		
+		private function applyGravity(Acceleration:Number = 320):void
+		{
 			angularVelocity = 200;
 		}
 		

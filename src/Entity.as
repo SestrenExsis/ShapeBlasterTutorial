@@ -5,6 +5,7 @@ package
 	public class Entity extends FlxSprite
 	{
 		public var radius:Number = 0;
+		public var hitboxRadius:Number = 0;
 		protected var cooldownTimer:FlxTimer;
 		protected var _position:FlxPoint;
 		protected var hitEdgeOfScreen:Boolean = false;
@@ -35,7 +36,7 @@ package
 			super.destroy();
 		}
 		
-		public function collidesWith(Object:FlxObject):void
+		public function collidesWith(Object:Entity, Distance:Number):void
 		{
 			
 		}
@@ -49,9 +50,9 @@ package
 				x = 0;
 				_wasClamped = true;
 			}
-			else if (x + width > FlxG.width) 
+			else if (x + 2 * hitboxRadius > FlxG.width) 
 			{
-				x = FlxG.width - width;
+				x = FlxG.width - 2 * hitboxRadius;
 				_wasClamped = true;
 			}
 			if (y < 0) 
@@ -59,9 +60,9 @@ package
 				y = 0;
 				_wasClamped = true;
 			}
-			else if (y + height > FlxG.height) 
+			else if (y + 2 * hitboxRadius > FlxG.height) 
 			{
-				y = FlxG.height - height;
+				y = FlxG.height - 2 * hitboxRadius;
 				_wasClamped = true;
 			}
 			return _wasClamped;
@@ -82,6 +83,32 @@ package
 			
 			_position.x = Value.x;
 			_position.y = Value.y;
+		}
+		
+		public static function toRadians(AngleInDegrees:Number):Number
+		{
+			return (AngleInDegrees * Math.PI) / 180;
+		}
+		
+		public static function toDegrees(AngleInRadians:Number):Number
+		{
+			return (AngleInRadians * 180) / Math.PI;
+		}
+		
+		public static function angleInDegrees(Vector:FlxPoint):Number
+		{
+			var _angleInRadians:Number = Math.atan2(Vector.y, Vector.x);
+			return (_angleInRadians / Math.PI) * 180;
+		}
+		
+		public static function angleInRadians(Vector:FlxPoint):Number
+		{
+			return Math.atan2(Vector.y, Vector.x);
+		}
+		
+		public static function linearInterpolate(Value1:Number, Value2:Number, WeightOfValue2:Number):Number
+		{
+			return Value1 + (Value2 - Value1) * WeightOfValue2;
 		}
 	}
 }

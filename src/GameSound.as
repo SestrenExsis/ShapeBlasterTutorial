@@ -39,6 +39,7 @@ package
 		public static function create():void
 		{
 			FlxG.playMusic(sfxMusic, 0.6);
+			FlxG.volume = 0.1;
 		}
 		
 		public static function randomSound(Sounds:Array, VolumeMultiplier:Number = 1.0):void

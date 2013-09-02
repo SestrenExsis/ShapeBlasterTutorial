@@ -10,7 +10,7 @@ package
 		{
 			super(X, Y);
 			loadRotatedGraphic(imgBullet, 360, -1, true, true);
-			radius = 10;
+			radius = hitboxRadius = 10;
 			width = height = 28;
 			offset.y = 0.5 * (28 - 9);
 			kill();
@@ -25,6 +25,7 @@ package
 		{
 			super.update();
 			
+			angle = angleInDegrees(velocity)
 			if (!onScreen()) kill();
 		}
 		
@@ -33,9 +34,9 @@ package
 			super.destroy();
 		}
 		
-		override public function collidesWith(Object:FlxObject):void
+		override public function collidesWith(Object:Entity, Distance:Number):void
 		{
-			if (Object is Enemy) kill();
+			
 		}
 	}
 }
