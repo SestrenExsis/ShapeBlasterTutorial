@@ -33,7 +33,7 @@ package
 						
 			entities = new FlxGroup();
 			entities.add(new PlayerShip());
-			for (var i:uint = 0; i < 50; i++) entities.add(new Bullet());
+			for (var i:uint = 0; i < 100; i++) entities.add(new Bullet());
 			for (i = 0; i < 200; i++) entities.add(new Enemy());
 			add(entities);
 			
@@ -125,7 +125,7 @@ package
 			var bullet:Bullet = Bullet(entities.getFirstAvailable(Bullet));
 			if (bullet) 
 			{
-				bullet.reset(PositionX, PositionY);
+				(bullet as Bullet).reset(PositionX, PositionY);
 				bullet.angle = Angle;
 				bullet.velocity.x = Speed * Math.cos((Angle / 180) * Math.PI);
 				bullet.velocity.y = Speed * Math.sin((Angle / 180) * Math.PI);
@@ -136,19 +136,21 @@ package
 		
 		public static function makeEnemy(Type:uint):Boolean
 		{
-			var _enemy:Enemy = Enemy(entities.getFirstAvailable(Enemy));
-			if (_enemy) 
+			var enemy:Enemy = Enemy(entities.getFirstAvailable(Enemy));
+			if (enemy) 
 			{
-				if (Type == Enemy.BLACK_HOLE) Enemy.blackHoles += 1;
-				_enemy.type = Type;
-				_enemy.position = getSpawnPosition(_enemy.position);
-				_enemy.reset(_enemy.position.x, _enemy.position.y);
+				var MinimumDistanceFromPlayer:Number;
+				if (Type == Enemy.BLACK_HOLE) MinimumDistanceFromPlayer = 5;
+				else MinimumDistanceFromPlayer = 150;
+				enemy.type = Type;
+				enemy.position = getSpawnPosition(enemy.position, MinimumDistanceFromPlayer);
+				enemy.reset(enemy.position.x, enemy.position.y);
 				return true;
 			}
 			else return false;
 		}
 		
-		public static function getSpawnPosition(Source:FlxPoint):FlxPoint
+		public static function getSpawnPosition(Source:FlxPoint, MinimumDistanceFromPlayer:Number):FlxPoint
 		{
 			var _x:int;
 			var _y:int;
@@ -161,7 +163,7 @@ package
 				_y = int(FlxG.random() * FlxG.height);
 				_xDelta = PlayerShip.instance.position.x - _x;
 				_yDelta = PlayerShip.instance.position.y - _y;
-			} while (_xDelta * _xDelta + _yDelta * _yDelta < 200 * 200);
+			} while (_xDelta * _xDelta + _yDelta * _yDelta < MinimumDistanceFromPlayer * MinimumDistanceFromPlayer);
 			
 			Source.x = _x;
 			Source.y = _y;

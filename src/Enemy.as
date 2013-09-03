@@ -33,7 +33,7 @@ package
 			
 			radius = 10;
 			hitboxRadius = 10;
-			maxVelocity.x = maxVelocity.y = 600;//384;
+			maxVelocity.x = maxVelocity.y = 300;//384;
 			
 			alive = false;
 			exists = false;
@@ -69,7 +69,7 @@ package
 		{
 			super.postUpdate();
 			
-			hitEdgeOfScreen = clampToScreen();
+			if (type != BLACK_HOLE) hitEdgeOfScreen = clampToScreen();
 		}
 		
 		override public function destroy():void
@@ -99,9 +99,6 @@ package
 			if (_previousType != _type)
 			{
 				_pixels = enemyPixels[_type];
-				//if (_type == SEEKER) _pixels = enemyPixels[SEEKER];
-				//else if (_type == WANDERER) _pixels = enemyPixels[WANDERER];
-				//else if (_type == BLACK_HOLE) _pixels = enemyPixels[BLACK_HOLE];
 				dirty = true;
 			}
 			switch (_type)
@@ -146,29 +143,34 @@ package
 					if (type == BLACK_HOLE)
 					{
 						
-						Object.velocity.x += 20 * Math.cos(AngleFromCenters);
-						Object.velocity.y += 20 * Math.sin(AngleFromCenters);
+						Object.velocity.x -= 18 * Math.cos(AngleFromCenters);
+						Object.velocity.y -= 18 * Math.sin(AngleFromCenters);
 					}
 				}
 			}
 			else if (Object is Enemy)
 			{
-				if (type == BLACK_HOLE && (Object as Enemy).type == BLACK_HOLE) return;
+				var IsBlackHole:Boolean = (type == BLACK_HOLE);
+				if (IsBlackHole && (Object as Enemy).type == BLACK_HOLE) return;
 				
-				if (IsHitBoxCollision) Object.kill();
+				if (IsHitBoxCollision) 
+				{
+					if (IsBlackHole) Object.kill();
+				}
 				else
 				{
-					if (type == BLACK_HOLE)
+					if (IsBlackHole)
 					{
-						//Entity.linearInterpolate(
+						var GravityStrength:Number = Entity.linearInterpolate(60, 0, Math.sqrt(DistanceSquared) / radius);
+						Object.velocity.x += GravityStrength * Math.cos(AngleFromCenters);
+						Object.velocity.y += GravityStrength * Math.sin(AngleFromCenters);
 					}
 					else
 					{
-						var VelocityX:Number = position.x - Object.position.x;
-						var VelocityY:Number = position.y - Object.position.y;
-						var DistanceSquared:Number = VelocityX * VelocityX + VelocityY * VelocityY;
-						velocity.x += 600 * VelocityX / (DistanceSquared + 1);
-						velocity.y += 600 * VelocityY / (DistanceSquared + 1);
+						var XDistance:Number = position.x - Object.position.x;
+						var YDistance:Number = position.y - Object.position.y;
+						velocity.x += 600 * XDistance / (DistanceSquared + 1);
+						velocity.y += 600 * YDistance / (DistanceSquared + 1);
 					}
 				}
 			}
@@ -185,6 +187,7 @@ package
 			acceleration.x = acceleration.y = 0;
 			angularVelocity = 0;
 			super.reset(X - 0.5 * width, Y - 0.5 * height);
+			if (type == BLACK_HOLE) blackHoles += 1;
 		}
 		
 		private function applyBehaviors():void
@@ -195,7 +198,7 @@ package
 			else if (type == BLACK_HOLE) applyGravity();
 		}
 		
-		private function followPlayer(Acceleration:Number = 10):void
+		private function followPlayer(Acceleration:Number = 5):void
 		{
 			if (PlayerShip.instance.alive) 
 			{
@@ -203,29 +206,30 @@ package
 				acceleration.y = Acceleration * (PlayerShip.instance.position.y - position.y);
 				angle = Entity.angleInDegrees(acceleration);
 			}
+			else moveRandomly();
 		}
 		
 		private function moveRandomly(Acceleration:Number = 320):void
 		{
-			var _angle:Number;
+			var Angle:Number;
 			if (hitEdgeOfScreen) 
 			{
 				cooldownTimer.stop();
 				cooldownTimer.start(1);
-				_angle = 2 * Math.PI * FlxG.random();
+				Angle = 2 * Math.PI * FlxG.random();
 				velocity.x = 0;
 				velocity.y = 0;
-				acceleration.x = Acceleration * Math.cos(_angle);
-				acceleration.y = Acceleration * Math.sin(_angle);
+				acceleration.x = Acceleration * Math.cos(Angle);
+				acceleration.y = Acceleration * Math.sin(Angle);
 				angularVelocity = 200;
 			}
 			
 			if (!cooldownTimer.finished || hitEdgeOfScreen) return;
 			cooldownTimer.stop();
 			cooldownTimer.start(1);
-			_angle = 2 * Math.PI * FlxG.random();
-			acceleration.x = Acceleration * Math.cos(_angle);
-			acceleration.y = Acceleration * Math.sin(_angle);
+			Angle = 2 * Math.PI * FlxG.random();
+			acceleration.x = Acceleration * Math.cos(Angle);
+			acceleration.y = Acceleration * Math.sin(Angle);
 			angularVelocity = 200;
 		}
 		

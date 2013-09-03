@@ -34,6 +34,15 @@ package
 			super.destroy();
 		}
 		
+		override public function reset(X:Number, Y:Number):void
+		{
+			cooldownTimer.stop();
+			alpha = 1;
+			acceleration.x = acceleration.y = 0;
+			angularVelocity = 0;
+			super.reset(X - 0.5 * width, Y - 0.5 * height);
+		}
+		
 		override public function collidesWith(Object:Entity, Distance:Number):void
 		{
 			

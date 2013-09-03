@@ -87,7 +87,7 @@ package
 		
 		public static function toRadians(AngleInDegrees:Number):Number
 		{
-			return (AngleInDegrees * Math.PI) / 180;
+			return ((90 + AngleInDegrees) * Math.PI) / 180;
 		}
 		
 		public static function toDegrees(AngleInRadians:Number):Number
@@ -108,7 +108,7 @@ package
 		
 		public static function linearInterpolate(Value1:Number, Value2:Number, WeightOfValue2:Number):Number
 		{
-			return Value1 + (Value2 - Value1) * WeightOfValue2;
+			return (Value1 + (Value2 - Value1) * WeightOfValue2);
 		}
 	}
 }
