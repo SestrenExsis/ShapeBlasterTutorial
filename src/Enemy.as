@@ -84,7 +84,19 @@ package
 			PlayerShip.increaseMultiplier();
 			super.kill();
 			GameSound.randomSound(GameSound.sfxExplosion, 0.5);
-			ScreenState.makeExplosion(position.x, position.y);
+			
+			var _color:uint;
+			switch (int(6 * FlxG.random()))
+			{
+				case 0: _color = 0xff3333; break;
+				case 1: _color = 0x33ff33; break;
+				case 2: _color = 0x3333ff; break;
+				case 3: _color = 0xffffaa; break;
+				case 4: _color = 0xff33ff; break;
+				case 5: _color = 0x00ffff; break;
+				default: _color = 0xffffff; break;
+			}
+			ScreenState.makeExplosion(position.x, position.y, 120, _color);
 		}
 		
 		override public function set type(Value:uint):void

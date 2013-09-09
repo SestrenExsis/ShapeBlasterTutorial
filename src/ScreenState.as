@@ -14,6 +14,8 @@ package
 		//[Embed(source="http://fonts.googleapis.com/css?family=Nova+Square", fontFamily="Nova Square", embedAsCFF="false")] public var fntNovaSquare:String;
 		private var _fx:FlxSprite;
 		private var blur:BlurFilter;
+		private var _rect:Rectangle;
+		private var _point:Point;
 		
 		//public static var canvas:Sprite;
 		private static var entities:FlxGroup;
@@ -56,10 +58,12 @@ package
 			_fx.makeGraphic(FlxG.width, FlxG.height, 0, true);
 			_fx.antialiasing = true;
 			_fx.blend = "screen";
+			_rect = new Rectangle(0, 0, FlxG.width, FlxG.height);
+			_point = new Point();
 			//canvas = FlxG.camera.getContainerSprite();
 			
-			blur = new BlurFilter(8, 8, BitmapFilterQuality.HIGH);
-			FlxG.watch(Enemy, "blackHoles");
+			blur = new BlurFilter(6, 6, BitmapFilterQuality.LOW);
+			//FlxG.watch(Enemy, "blackHoles");
 		}
 		
 		override public function update():void
@@ -85,12 +89,10 @@ package
 		
 		override public function draw():void
 		{
-			//canvas.graphics.clear();
 			super.draw();
-			//FlxG.camera.screen.pixels.draw(canvas);
 			
 			_fx.stamp(FlxG.camera.screen);
-			FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, new Rectangle(0,0,FlxG.width,FlxG.height), new Point(0,0), blur);
+			FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
 			_fx.draw();
 		}
 		
@@ -176,11 +178,11 @@ package
 			return _overwritten;
 		}
 		
-		public static function makeExplosion(PositionX:Number, PositionY:Number, NumberOfParticles:uint = 120, Color:uint = FlxG.GREEN):void
+		public static function makeExplosion(PositionX:Number, PositionY:Number, NumberOfParticles:uint = 120, Color:uint = 0xff00ff):void
 		{
 			for (var i:uint = 0; i < NumberOfParticles; i++)
 			{
-				makeParticle(PositionX, PositionY, 360 * FlxG.random(), Particle.MAX_SPEED * (1 - 0.25 * FlxG.random()), Color);
+				makeParticle(PositionX, PositionY, 360 * FlxG.random(), Particle.MAX_SPEED * (1 - 0.5 * FlxG.random()), Color);
 			}
 		}
 		

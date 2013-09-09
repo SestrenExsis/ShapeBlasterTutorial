@@ -26,7 +26,11 @@ package
 			super.update();
 			
 			angle = angleInDegrees(velocity)
-			if (!onScreen()) kill();
+			if (!onScreen()) 
+			{
+				ScreenState.makeExplosion(position.x, position.y, 30, 0x33ccff);
+				kill();
+			}
 		}
 		
 		override public function destroy():void
