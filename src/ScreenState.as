@@ -162,6 +162,8 @@ package
 		
 		public static function makeParticle(PositionX:Number, PositionY:Number, Angle:Number, Speed:Number, Color:uint = FlxG.WHITE):Boolean
 		{
+			Particle.index += 1;
+			if (Particle.index >= Particle.max) Particle.index = 0;
 			var _overwritten:Boolean = false;
 			var _particle:Particle = particles.members[Particle.index];
 			if (_particle.exists) _overwritten = true;
@@ -171,9 +173,6 @@ package
 			//_particle.angle = Angle;
 			_particle.lineColor = Color;
 			_particle.setVelocity((Angle * Math.PI) / 180, Speed);
-			
-			Particle.index += 1;
-			if (Particle.index >= Particle.max) Particle.index = 0;
 			return _overwritten;
 		}
 		

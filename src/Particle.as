@@ -15,11 +15,11 @@ package
 		public static var index:int = 0;
 		public static var activeCount:int = 0;
 		public static var max:uint = 2000;
-		private var lifespan:Number = 3;
+		private var lifespan:Number = 3.125;
 
 		public var lineScale:Number = 0.025;
 		public var lineColor:uint = FlxG.WHITE;
-		public var speedDecay:Number = 0.97;
+		public var speedDecay:Number = 1;
 
 		public function Particle(X:Number = 0, Y:Number = 0)
 		{
@@ -36,14 +36,12 @@ package
 		{
 			super.update();
 			
-			drag.x = speedDecay * velocity.x;
-			drag.y = speedDecay * velocity.y;
+			//drag.x = speedDecay * velocity.x;
+			//drag.y = speedDecay * velocity.y;
 			
-			if(lifespan <= 0)
-				return;
+			if(lifespan <= 0) return;
 			lifespan -= FlxG.elapsed;
-			if(lifespan <= 0)
-				kill();
+			if(lifespan <= 0) kill();
 		}
 		
 		override public function draw():void
@@ -75,8 +73,6 @@ package
 		override public function reset(X:Number, Y:Number):void
 		{
 			super.reset(X, Y);
-			drag.x = speedDecay * velocity.x;
-			drag.y = speedDecay * velocity.y;
 			lifespan = 3.125;
 			if (!alive) activeCount += 1;
 		}
@@ -90,6 +86,8 @@ package
 		{
 			velocity.x = Magnitude * Math.cos(Angle);
 			velocity.y = Magnitude * Math.sin(Angle);
+			drag.x = Math.abs(speedDecay * velocity.x);
+			drag.y = Math.abs(speedDecay * velocity.y);
 		}
 	}
 }
