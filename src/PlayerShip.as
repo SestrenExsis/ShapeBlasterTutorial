@@ -18,7 +18,6 @@ package
 		private static var multiplierTimeLeft:Number; // time until the current multiplier expires
 		private static var scoreForExtraLife:int; // score required to gain an extra life
 		
-		public var speed:Number = 480;
 		public var bulletSpeed:Number = 660;
 		protected var aim:FlxPoint;
 		
@@ -28,6 +27,7 @@ package
 		{
 			super(0.5 * FlxG.width, 0.5 * FlxG.height);
 			
+			moveSpeed = 480;
 			loadRotatedGraphic(imgPlayer, 8, -1, true, true);
 			radius = hitboxRadius = 10;
 			aim = new FlxPoint();
@@ -55,8 +55,8 @@ package
 			}
 			
 			velocity = GameInput.move;
-			velocity.x *= speed;
-			velocity.y *= speed;
+			velocity.x *= moveSpeed;
+			velocity.y *= moveSpeed;
 			if (velocity.x != 0 || velocity.y != 0) angle = angleInDegrees(velocity);
 			
 			aim = GameInput.aim;
@@ -178,12 +178,6 @@ package
 			
 			multiplierTimeLeft = MULTIPLIER_EXPIRY_TIME;
 			if (multiplier < MULTIPLIER_MAX) multiplier++;
-		}
-		
-		public function setAimFromPolar(Angle:Number, Magnitude:Number):void
-		{
-			aim.x = Magnitude * Math.cos(Angle);
-			aim.y = Magnitude * Math.sin(Angle);
 		}
 	}
 }

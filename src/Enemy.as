@@ -16,7 +16,6 @@ package
 		
 		private var enemyPixels:Array = new Array();
 		private var pointValue:int = 10;
-		protected var _type:uint;
 		
 		public static var blackHoles:int = 0;
 
@@ -85,14 +84,10 @@ package
 			PlayerShip.increaseMultiplier();
 			super.kill();
 			GameSound.randomSound(GameSound.sfxExplosion, 0.5);
+			ScreenState.makeExplosion(position.x, position.y);
 		}
 		
-		public function get type():uint
-		{
-			return _type;
-		}
-		
-		public function set type(Value:uint):void
+		override public function set type(Value:uint):void
 		{
 			var _previousType:uint = _type;
 			_type = Value;

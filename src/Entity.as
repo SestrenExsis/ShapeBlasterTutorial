@@ -4,8 +4,11 @@ package
 	
 	public class Entity extends FlxSprite
 	{
+		protected var _type:uint;
 		public var radius:Number = 0;
 		public var hitboxRadius:Number = 0;
+		public var moveSpeed:Number = 0;
+		public var moveAcceleration:Number = 0;
 		protected var cooldownTimer:FlxTimer;
 		protected var _position:FlxPoint;
 		protected var hitEdgeOfScreen:Boolean = false;
@@ -83,6 +86,16 @@ package
 			
 			_position.x = Value.x;
 			_position.y = Value.y;
+		}
+		
+		public function get type():uint
+		{
+			return _type;
+		}
+		
+		public function set type(Value:uint):void
+		{
+			_type = Value;
 		}
 		
 		public static function toRadians(AngleInDegrees:Number):Number
