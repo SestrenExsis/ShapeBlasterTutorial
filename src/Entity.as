@@ -119,9 +119,49 @@ package
 			return Math.atan2(Vector.y, Vector.x);
 		}
 		
-		public static function linearInterpolate(Value1:Number, Value2:Number, WeightOfValue2:Number):Number
+		public static function interpolate(Value1:Number, Value2:Number, WeightOfValue2:Number):Number
 		{
 			return (Value1 + (Value2 - Value1) * WeightOfValue2);
+		}
+		
+		public static function interpolateRGB(ColorA:uint, ColorB:uint, WeightOfColorB:Number):uint
+		{
+			var _r:int = interpolate(0xff & (ColorA >> 16), 0xff & (ColorB >> 16), WeightOfColorB);
+			var _g:int = interpolate(0xff & (ColorA >> 8), 0xff & (ColorB >> 8), WeightOfColorB);
+			var _b:int = interpolate(0xff & ColorA, 0xff & ColorB, WeightOfColorB);
+			
+			return (_r << 16) | (_g << 8) | _b;
+		}
+		
+		/**
+		 * Modified from http://www.therealjoshua.com/code/flex/calico/src/com/flashfactory/calico/utils/ColorMathUtil.as
+		 * Converts Hue, Saturation, Value to RRGGBB format
+		 * @Hue Angle between 0-360
+		 * @Saturation Number between 0 and 1
+		 * @Value Number between 0 and 1
+		 */
+		public static function HSVtoRGB(Hue:Number, Saturation:Number, Value:Number):uint
+		{
+			var hi:int = Math.floor(Hue/60) % 6;
+			var f:Number = Hue/60 - Math.floor(Hue/60);
+			var p:Number = (Value * (1 - Saturation));
+			var q:Number = (Value * (1 - f * Saturation));
+			var t:Number = (Value * (1 - (1 - f) * Saturation));
+			
+			var r:Number;
+			var g:Number;
+			var b:Number;
+			switch(hi)
+			{
+				case 0: r = Value;	g = t;		b = p;		break;
+				case 1: r = q; 		g = Value;	b = p;		break;
+				case 2: r = p;		g = Value;	b = t;		break;
+				case 3: r = p;		g = q;		b = Value;	break;
+				case 4: r = t;		g = p;		b = Value;	break;
+				case 5: r = Value;	g = p;		b = q;		break;
+			}
+			
+			return Math.round(r * 255) << 16 | Math.round(g * 255) << 8 | Math.round(b * 255);
 		}
 	}
 }

@@ -28,7 +28,7 @@ package
 			angle = angleInDegrees(velocity)
 			if (!onScreen()) 
 			{
-				ScreenState.makeExplosion(position.x, position.y, 30, 0x33ccff);
+				ScreenState.makeExplosion(Particle.BULLET, position.x, position.y, 30, 0x33ccff, 0x22bbdd);
 				kill();
 			}
 		}

@@ -78,6 +78,7 @@ package
 		override public function kill():void
 		{
 			super.kill();
+			ScreenState.makeExplosion(Particle.NONE, position.x, position.y, 1200, 0xffff00, 0xffffff);
 			cooldownTimer.stop();
 			if (lives-- < 0) 
 			{

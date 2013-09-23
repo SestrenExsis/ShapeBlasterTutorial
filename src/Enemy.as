@@ -1,6 +1,7 @@
 package
 {
 	import flash.display.BitmapData;
+	import flash.utils.getTimer;
 	
 	import org.flixel.*;
 
@@ -17,8 +18,6 @@ package
 		private var enemyPixels:Array = new Array();
 		private var pointValue:int = 10;
 		
-		public static var blackHoles:int = 0;
-
 		public function Enemy(X:Number = 0, Y:Number = 0, Type:uint = 0)
 		{
 			super(FlxG.width * FlxG.random(), FlxG.height * FlxG.random());
@@ -58,6 +57,21 @@ package
 			{
 				alpha += FlxG.elapsed;
 			}
+			
+			if (type == BLACK_HOLE)
+			{
+				if (cooldownTimer.finished)
+				{
+					cooldownTimer.stop();
+					cooldownTimer.start(0.02 + 0.08 * FlxG.random());
+					var _angle:Number = (0.720 * getTimer()) % 360;
+					var _color:uint = Entity.HSVtoRGB(5, 0.5, 0.8); // light purple
+					var _speed:Number = 720 + FlxG.random() * 180;
+					var _offsetX:Number = 16 * Math.sin(Entity.toRadians(_angle));
+					var _offsetY:Number = -16 * Math.cos(Entity.toRadians(_angle));
+					ScreenState.makeParticle(Particle.ENEMY, position.x + _offsetX, position.y + _offsetY, _angle, _speed, _color);
+				}
+			}
 
 			//gradually build up speed
 			//velocity.x *= 0.8;
@@ -76,10 +90,21 @@ package
 			super.destroy();
 		}
 		
+		override public function hurt(Damage:Number):void
+		{
+			super.hurt(Damage);
+			
+			if (type == BLACK_HOLE)
+			{
+				var hue:Number = (0.180 * getTimer()) % 360;
+				var _color:uint = Entity.HSVtoRGB(hue, 0.25, 1);
+				ScreenState.makeExplosion(Particle.IGNORE_GRAVITY, position.x, position.y, 150, _color);
+			}
+		}
+		
 		override public function kill():void
 		{
 			if (!alive) return;
-			if (type == BLACK_HOLE) blackHoles -= 1;
 			PlayerShip.addPoints(pointValue);
 			PlayerShip.increaseMultiplier();
 			super.kill();
@@ -96,7 +121,7 @@ package
 				case 5: _color = 0x00ffff; break;
 				default: _color = 0xffffff; break;
 			}
-			ScreenState.makeExplosion(position.x, position.y, 120, _color);
+			ScreenState.makeExplosion(Particle.ENEMY, position.x, position.y, 120, _color, FlxG.WHITE);
 		}
 		
 		override public function set type(Value:uint):void
@@ -168,7 +193,7 @@ package
 				{
 					if (IsBlackHole)
 					{
-						var GravityStrength:Number = Entity.linearInterpolate(60, 0, Math.sqrt(DistanceSquared) / radius);
+						var GravityStrength:Number = Entity.interpolate(60, 0, Math.sqrt(DistanceSquared) / radius);
 						Object.velocity.x += GravityStrength * Math.cos(AngleFromCenters);
 						Object.velocity.y += GravityStrength * Math.sin(AngleFromCenters);
 					}
@@ -194,7 +219,6 @@ package
 			acceleration.x = acceleration.y = 0;
 			angularVelocity = 0;
 			super.reset(X - 0.5 * width, Y - 0.5 * height);
-			if (type == BLACK_HOLE) blackHoles += 1;
 		}
 		
 		private function applyBehaviors():void

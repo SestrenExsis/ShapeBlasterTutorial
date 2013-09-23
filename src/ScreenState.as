@@ -18,8 +18,9 @@ package
 		private var _point:Point;
 		
 		//public static var canvas:Sprite;
-		private static var entities:FlxGroup;
+		public static var blackholes:FlxGroup;
 		private static var particles:FlxGroup;
+		private static var entities:FlxGroup;
 		private static var cursor:FlxSprite;
 		private static var displayText:FlxText;
 		private static var inverseSpawnChance:Number = 60;
@@ -35,6 +36,10 @@ package
 			super.create();
 			GameInput.create();
 			GameSound.create();
+			
+			particles = new FlxGroup();
+			for (i = 0; i < 2000; i++) particles.add(new Particle());
+			add(particles);
 						
 			entities = new FlxGroup();
 			entities.add(new PlayerShip());
@@ -42,9 +47,9 @@ package
 			for (i = 0; i < 200; i++) entities.add(new Enemy());
 			add(entities);
 			
-			particles = new FlxGroup();
-			for (i = 0; i < 2000; i++) particles.add(new Particle());
-			add(particles);
+			blackholes = new FlxGroup();
+			for (i = 0; i < 2; i++) blackholes.add(new Enemy());
+			add(blackholes);
 			
 			cursor = new FlxSprite(FlxG.mouse.x, FlxG.mouse.x);
 			cursor.loadGraphic(imgPointer);
@@ -60,10 +65,8 @@ package
 			_fx.blend = "screen";
 			_rect = new Rectangle(0, 0, FlxG.width, FlxG.height);
 			_point = new Point();
-			//canvas = FlxG.camera.getContainerSprite();
 			
 			blur = new BlurFilter(6, 6, BitmapFilterQuality.LOW);
-			//FlxG.watch(Enemy, "blackHoles");
 		}
 		
 		override public function update():void
@@ -76,10 +79,11 @@ package
 			
 			if (FlxG.random() < 1 / inverseSpawnChance) makeEnemy(Enemy.SEEKER);
 			if (FlxG.random() < 1 / inverseSpawnChance) makeEnemy(Enemy.WANDERER);
-			if (Enemy.blackHoles < 2) if (FlxG.random() < 1 / (inverseSpawnChance * 10)) makeEnemy(Enemy.BLACK_HOLE);
+			if (blackholes.countLiving() < 2) if (FlxG.random() < 1 / (inverseSpawnChance * 10)) makeBlackhole();
 			if (inverseSpawnChance > 20) inverseSpawnChance -= 0.005;
 			
 			FlxG.overlap(entities, entities, handleCollision);
+			FlxG.overlap(blackholes, entities, handleCollision);
 			
 			if (PlayerShip.isGameOver) displayText.text = "Game Over\n" + "Your Score: " + 
 				PlayerShip.score + "\n" + "High Score: " + PlayerShip.highScore;
@@ -91,9 +95,9 @@ package
 		{
 			super.draw();
 			
-			_fx.stamp(FlxG.camera.screen);
-			FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
-			_fx.draw();
+			//_fx.stamp(FlxG.camera.screen);
+			//FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
+			//_fx.draw();
 		}
 		
 		public function handleCollision(Object1:FlxObject, Object2:FlxObject):void
@@ -151,9 +155,7 @@ package
 			var _enemy:Enemy = Enemy(entities.getFirstAvailable(Enemy));
 			if (_enemy) 
 			{
-				var MinimumDistanceFromPlayer:Number;
-				if (Type == Enemy.BLACK_HOLE) MinimumDistanceFromPlayer = 20;
-				else MinimumDistanceFromPlayer = 150;
+				var MinimumDistanceFromPlayer:Number = 150;
 				_enemy.type = Type;
 				_enemy.position = getSpawnPosition(_enemy.position, MinimumDistanceFromPlayer);
 				_enemy.reset(_enemy.position.x, _enemy.position.y);
@@ -162,7 +164,21 @@ package
 			else return false;
 		}
 		
-		public static function makeParticle(PositionX:Number, PositionY:Number, Angle:Number, Speed:Number, Color:uint = FlxG.WHITE):Boolean
+		public static function makeBlackhole():Boolean
+		{
+			var _enemy:Enemy = Enemy(blackholes.getFirstAvailable(Enemy));
+			if (_enemy) 
+			{
+				var MinimumDistanceFromPlayer:Number = 20
+				_enemy.type = Enemy.BLACK_HOLE;
+				_enemy.position = getSpawnPosition(_enemy.position, MinimumDistanceFromPlayer);
+				_enemy.reset(_enemy.position.x, _enemy.position.y);
+				return true;
+			}
+			else return false;
+		}
+		
+		public static function makeParticle(Type:uint, PositionX:Number, PositionY:Number, Angle:Number, Speed:Number, Color:uint = FlxG.WHITE):Boolean
 		{
 			Particle.index += 1;
 			if (Particle.index >= Particle.max) Particle.index = 0;
@@ -171,18 +187,25 @@ package
 			if (_particle.exists) _overwritten = true;
 
 			_particle.reset(PositionX, PositionY);
-			//_particle.moveSpeed = Speed;
-			//_particle.angle = Angle;
+			_particle.type = Type;
 			_particle.lineColor = Color;
 			_particle.setVelocity((Angle * Math.PI) / 180, Speed);
 			return _overwritten;
 		}
 		
-		public static function makeExplosion(PositionX:Number, PositionY:Number, NumberOfParticles:uint = 120, Color:uint = 0xff00ff):void
+		public static function makeExplosion(Type:uint, PositionX:Number, PositionY:Number, NumberOfParticles:uint = 120, Color:uint = 0xff00ff, BlendColor:int = -1):void
 		{
+			var _mixColors:Boolean = true;
+			var _mixedColor:uint;
+			if (BlendColor < 0) 
+			{
+				BlendColor = _mixedColor = Color;
+				_mixColors = false;
+			}
 			for (var i:uint = 0; i < NumberOfParticles; i++)
 			{
-				makeParticle(PositionX, PositionY, 360 * FlxG.random(), Particle.MAX_SPEED * (1 - 0.5 * FlxG.random()), Color);
+				if (_mixColors) _mixedColor = Entity.interpolateRGB(Color, BlendColor, FlxG.random());
+				makeParticle(Type, PositionX, PositionY, 360 * FlxG.random(), Particle.MAX_SPEED * (1 - 0.5 * FlxG.random()), _mixedColor);
 			}
 		}
 		
