@@ -31,7 +31,7 @@ package
 			max += 1;
 			
 			angle = 0;
-			radius = 11;
+			radius = 0;
 			width = height = 1;
 			kill();
 		}
@@ -87,10 +87,10 @@ package
 		{
 			var _minSpeedRatio:Number = 0.8;
 			//super.draw();
-			var _startX:Number = position.x;
-			var _startY:Number = position.y;
-			var _endX:Number = _startX + lineScale * velocity.x;
-			var _endY:Number = _startY + lineScale * velocity.y;
+			var _startX:Number = position.x - 0.5 * lineScale * velocity.x;
+			var _startY:Number = position.y - 0.5 * lineScale * velocity.y;
+			var _endX:Number = position.x + 0.5 * lineScale * velocity.x;
+			var _endY:Number = position.y + 0.5 * lineScale * velocity.y;
 			var _speedRatio:Number = _minSpeedRatio + (1 - _minSpeedRatio) * ((velocity.x * velocity.x + velocity.y * velocity.y) / (maxSpeed * maxSpeed));
 			var _lifespanRatio:Number = lifespan / maxLifespan;
 			var _r:int = interpolate(0x00, 0xff & (lineColor >> 16), _lifespanRatio);

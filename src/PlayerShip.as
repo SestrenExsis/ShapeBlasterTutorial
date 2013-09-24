@@ -1,7 +1,8 @@
 package
 {
-	import org.flixel.*;
 	import flash.utils.getTimer;
+	
+	import org.flixel.*;
 	
 	public class PlayerShip extends Entity
 	{
@@ -40,6 +41,8 @@ package
 		override public function draw():void
 		{
 			super.draw();
+			FlxG.camera.screen.drawLine(position.x - 2, position.y - 2, position.x + 2, position.y + 2, 0xff0000, 2);
+			FlxG.camera.screen.drawLine(position.x - 2, position.y + 2, position.x + 2, position.y - 2, 0xff0000, 2);
 		}
 		
 		override public function update():void
@@ -59,7 +62,11 @@ package
 			velocity = GameInput.move;
 			velocity.x *= moveSpeed;
 			velocity.y *= moveSpeed;
-			if (velocity.x != 0 || velocity.y != 0) angle = angleInDegrees(velocity);
+			if (velocity.x != 0 || velocity.y != 0) 
+			{
+				angle = angleInDegrees(velocity);
+				exhaust();
+			}
 			
 			aim = GameInput.aim;
 			if (cooldownTimer.finished && (aim.x != 0 || aim.y != 0)) shoot(aim);
@@ -160,48 +167,25 @@ package
 		
 		private function exhaust():void
 		{
-			if (velocity.x > 0 || velocity.y > 0)
-			{
-				// set up some variables
-				//Orientation = Velocity.ToAngle();
-				//Quaternion rot = Quaternion.CreateFromYawPitchRoll(0f, 0f, Orientation);
-				
-				var t:Number = getTimer();
-				// The primary velocity of the particles is 3 pixels/frame in the direction opposite to which the ship is travelling.
-				_point = GameInput.normalize(velocity);
-				var _velocityX:Number = -3 * _point.x;
-				var _velocityY:Number = -3 * _point.y;
-				// Calculate the sideways velocity for the two side streams. The direction is perpendicular to the ship's velocity and the
-				// magnitude varies sinusoidally.
-				var _perpVelocityX:Number = (0.6 * Math.sin(10 * t)) * _velocityY;
-				var _perpVelocityY:Number = (0.6 * Math.sin(10 * t)) * -_velocityX;
-				var sideColor:uint = 0xc82609; // deep red
-				var midColor:uint = 0xffbb1e; // orange-yellow
-				var _exhaustX:Number = position.x + (25 / 480) * _velocityX;
-				var _exhaustY:Number = position.y + (25 / 480) * _velocityY;
-				var _alpha:Number = 0.7;
-				
-				// middle particle stream
-				ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180, 3 * moveSpeed);
-				//Vector2 velMid = baseVel + rand.NextVector2(0, 1);
-				//GameRoot.ParticleManager.CreateParticle(Art.LineParticle, pos, Color.White * alpha, 60f, new Vector2(0.5f, 1),
-				//	new ParticleState(velMid, ParticleType.Enemy));
-				//GameRoot.ParticleManager.CreateParticle(Art.Glow, pos, midColor * alpha, 60f, new Vector2(0.5f, 1),
-				//	new ParticleState(velMid, ParticleType.Enemy));
-				
-				// side particle streams
-				/*Vector2 vel1 = baseVel + _perpVelocity + rand.NextVector2(0, 0.3f);
-				Vector2 vel2 = baseVel - _perpVelocity + rand.NextVector2(0, 0.3f);
-				GameRoot.ParticleManager.CreateParticle(Art.LineParticle, pos, Color.White * alpha, 60f, new Vector2(0.5f, 1),
-					new ParticleState(vel1, ParticleType.Enemy));
-				GameRoot.ParticleManager.CreateParticle(Art.LineParticle, pos, Color.White * alpha, 60f, new Vector2(0.5f, 1),
-					new ParticleState(vel2, ParticleType.Enemy));
-				
-				GameRoot.ParticleManager.CreateParticle(Art.Glow, pos, sideColor * alpha, 60f, new Vector2(0.5f, 1),
-					new ParticleState(vel1, ParticleType.Enemy));
-				GameRoot.ParticleManager.CreateParticle(Art.Glow, pos, sideColor * alpha, 60f, new Vector2(0.5f, 1),
-					new ParticleState(vel2, ParticleType.Enemy));*/
-			}
+			var t:Number = getTimer();
+			// The primary velocity of the particles is 3 pixels/frame in the direction opposite to which the ship is travelling.
+			_point.x = -velocity.x;
+			_point.y = -velocity.y;
+			GameInput.normalize(_point);
+			var _speed:Number = 120 + 60 * FlxG.random();
+			// Calculate the sideways velocity for the two side streams. The direction is perpendicular to the ship's velocity and the
+			// magnitude varies sinusoidally.
+			var _angle:Number = (45 + 15 * FlxG.random()) * Math.sin(0.01 * t);
+			var _sideColor:uint = 0xc82609; // deep red
+			var _midColor:uint = 0xffbb1e; // orange-yellow
+			var _exhaustX:Number = position.x + 20 * _point.x;
+			var _exhaustY:Number = position.y + 20 * _point.y;
+			
+			// middle particle stream
+			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180, _speed, _midColor);
+			//ScreenState.makeGlow(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180, 180, _midColor);
+			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180 + _angle, _speed, _sideColor);
+			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180 - _angle, _speed, _sideColor);
 		}
 		
 		public function resetMultiplier():void
