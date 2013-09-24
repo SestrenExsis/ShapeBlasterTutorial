@@ -10,7 +10,9 @@ package
 		public static const BULLET:uint = 2;
 		public static const IGNORE_GRAVITY:uint = 3;
 		
-		public static const MAX_SPEED:Number = 960;
+		public static const LOW_SPEED:Number = 720;
+		public static const MEDIUM_SPEED:Number = 960;
+		public static const HIGH_SPEED:Number = 2160;
 		
 		public static var index:int = 0;
 		public static var activeCount:int = 0;
@@ -18,9 +20,10 @@ package
 		public static var maxLifespan:Number = 3.25;
 		
 		public var lifespan:Number;
-		public var lineScale:Number = 0.025;
+		public var lineScale:Number = 0.05;
 		public var lineColor:uint = FlxG.WHITE;
-		public var speedDecay:Number = 0.94;
+		public var speedDecay:Number = 0.92;
+		public var maxSpeed:Number;
 
 		public function Particle(X:Number = 0, Y:Number = 0)
 		{
@@ -58,14 +61,14 @@ package
 						if (_distance < 300)
 						{
 							_point = GameInput.normalize(_point);
-							velocity.x += 10 * _point.x;//10000 * _point.x / (_distance * _distance + 10000);
-							velocity.y += 10 * _point.y;//10000 * _point.y / (_distance * _distance + 10000);
+							velocity.x += 20 * (10000 / (_distance * _distance + 10000)) * _point.x;//10000 * _point.x / (_distance * _distance + 10000);
+							velocity.y += 20 * (10000 / (_distance * _distance + 10000)) * _point.y;//10000 * _point.y / (_distance * _distance + 10000);
 							
 							// add tangential acceleration for nearby particles
 							if (_distance < 400)
 							{
-								velocity.x += 8 * _point.y;// / _distance;//45 * _point.y / (_distance + 100);
-								velocity.y -= 8 * _point.x;// / _distance;//-45 * _point.x / (_distance + 100);
+								velocity.x += 100 * (100 / (_distance * _distance + 100)) * _point.y;// / _distance;//45 * _point.y / (_distance + 100);
+								velocity.y -= 100 * (100 / (_distance * _distance + 100)) * _point.x;// / _distance;//-45 * _point.x / (_distance + 100);
 							}
 						}
 					}
@@ -88,7 +91,7 @@ package
 			var _startY:Number = position.y;
 			var _endX:Number = _startX + lineScale * velocity.x;
 			var _endY:Number = _startY + lineScale * velocity.y;
-			var _speedRatio:Number = _minSpeedRatio + (1 - _minSpeedRatio) * ((velocity.x * velocity.x + velocity.y * velocity.y) / (MAX_SPEED * MAX_SPEED));
+			var _speedRatio:Number = _minSpeedRatio + (1 - _minSpeedRatio) * ((velocity.x * velocity.x + velocity.y * velocity.y) / (maxSpeed * maxSpeed));
 			var _lifespanRatio:Number = lifespan / maxLifespan;
 			var _r:int = interpolate(0x00, 0xff & (lineColor >> 16), _lifespanRatio);
 			var _g:int = interpolate(0x00, 0xff & (lineColor >> 8), _lifespanRatio);

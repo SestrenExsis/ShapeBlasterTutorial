@@ -10,7 +10,8 @@ package
 		{
 			super(X, Y);
 			loadRotatedGraphic(imgBullet, 360, -1, true, true);
-			radius = hitboxRadius = 10;
+			radius = 14;
+			hitboxRadius = 8;
 			width = height = 28;
 			offset.y = 0.5 * (28 - 9);
 			kill();
@@ -28,7 +29,7 @@ package
 			angle = angleInDegrees(velocity)
 			if (!onScreen()) 
 			{
-				ScreenState.makeExplosion(Particle.BULLET, position.x, position.y, 30, 0x33ccff, 0x22bbdd);
+				ScreenState.makeExplosion(Particle.BULLET, position.x, position.y, 30, Particle.LOW_SPEED, 0x33ccff, 0x22bbdd);
 				kill();
 			}
 		}

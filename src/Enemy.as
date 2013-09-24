@@ -29,8 +29,8 @@ package
 			_pixels = enemyPixels[SEEKER];
 			_type = SEEKER;
 			
-			radius = 10;
-			hitboxRadius = 10;
+			radius = 20;
+			hitboxRadius = 18;
 			maxVelocity.x = maxVelocity.y = 300;//384;
 			
 			alive = false;
@@ -65,8 +65,8 @@ package
 					cooldownTimer.stop();
 					cooldownTimer.start(0.02 + 0.08 * FlxG.random());
 					var _angle:Number = (0.720 * getTimer()) % 360;
-					var _color:uint = Entity.HSVtoRGB(5, 0.5, 0.8); // light purple
-					var _speed:Number = 720 + FlxG.random() * 180;
+					var _color:uint = 0xff00ff;//Entity.HSVtoRGB(5, 0.5, 0.8); // light purple
+					var _speed:Number = 360 + FlxG.random() * 90;
 					var _offsetX:Number = 16 * Math.sin(Entity.toRadians(_angle));
 					var _offsetY:Number = -16 * Math.cos(Entity.toRadians(_angle));
 					ScreenState.makeParticle(Particle.ENEMY, position.x + _offsetX, position.y + _offsetY, _angle, _speed, _color);
@@ -98,7 +98,7 @@ package
 			{
 				var hue:Number = (0.180 * getTimer()) % 360;
 				var _color:uint = Entity.HSVtoRGB(hue, 0.25, 1);
-				ScreenState.makeExplosion(Particle.IGNORE_GRAVITY, position.x, position.y, 150, _color);
+				ScreenState.makeExplosion(Particle.IGNORE_GRAVITY, position.x, position.y, 150, Particle.MEDIUM_SPEED, _color);
 			}
 		}
 		
@@ -121,7 +121,7 @@ package
 				case 5: _color = 0x00ffff; break;
 				default: _color = 0xffffff; break;
 			}
-			ScreenState.makeExplosion(Particle.ENEMY, position.x, position.y, 120, _color, FlxG.WHITE);
+			ScreenState.makeExplosion(Particle.ENEMY, position.x, position.y, 120, Particle.MEDIUM_SPEED, _color, FlxG.WHITE);
 		}
 		
 		override public function set type(Value:uint):void
@@ -138,20 +138,20 @@ package
 				case SEEKER:
 					alpha = 0;
 					health = 1;
-					radius = 10;
-					hitboxRadius = 10;
+					radius = 20;
+					hitboxRadius = 18;
 					break;
 				case WANDERER:
 					alpha = 0;
 					health = 1;
-					radius = 10;
-					hitboxRadius = 10;
+					radius = 20;
+					hitboxRadius = 18;
 					break;
 				case BLACK_HOLE:
 					alpha = 1;
 					health = 10;
 					radius = 250;
-					hitboxRadius = 10;
+					hitboxRadius = 18;
 					break;
 			}
 			width = height = 2 * Math.max(radius, hitboxRadius);

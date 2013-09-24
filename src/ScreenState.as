@@ -95,9 +95,9 @@ package
 		{
 			super.draw();
 			
-			//_fx.stamp(FlxG.camera.screen);
-			//FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
-			//_fx.draw();
+			_fx.stamp(FlxG.camera.screen);
+			FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
+			_fx.draw();
 		}
 		
 		public function handleCollision(Object1:FlxObject, Object2:FlxObject):void
@@ -190,10 +190,11 @@ package
 			_particle.type = Type;
 			_particle.lineColor = Color;
 			_particle.setVelocity((Angle * Math.PI) / 180, Speed);
+			_particle.maxSpeed = Speed;
 			return _overwritten;
 		}
 		
-		public static function makeExplosion(Type:uint, PositionX:Number, PositionY:Number, NumberOfParticles:uint = 120, Color:uint = 0xff00ff, BlendColor:int = -1):void
+		public static function makeExplosion(Type:uint, PositionX:Number, PositionY:Number, NumberOfParticles:uint, Speed:Number, Color:uint = 0xff00ff, BlendColor:int = -1):void
 		{
 			var _mixColors:Boolean = true;
 			var _mixedColor:uint;
@@ -205,7 +206,7 @@ package
 			for (var i:uint = 0; i < NumberOfParticles; i++)
 			{
 				if (_mixColors) _mixedColor = Entity.interpolateRGB(Color, BlendColor, FlxG.random());
-				makeParticle(Type, PositionX, PositionY, 360 * FlxG.random(), Particle.MAX_SPEED * (1 - 0.5 * FlxG.random()), _mixedColor);
+				makeParticle(Type, PositionX, PositionY, 360 * FlxG.random(), Speed * (1 - 0.5 * FlxG.random()), _mixedColor);
 			}
 		}
 		
