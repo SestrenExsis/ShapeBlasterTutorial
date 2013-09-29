@@ -182,7 +182,7 @@ package
 			var _exhaustY:Number = position.y + 20 * _point.y;
 			
 			// middle particle stream
-			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180, _speed, _midColor);
+			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180, _speed, _midColor, true);
 			//ScreenState.makeGlow(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180, 180, _midColor);
 			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180 + _angle, _speed, _sideColor);
 			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180 - _angle, _speed, _sideColor);

@@ -4,7 +4,8 @@ package
 	
 	public class Particle extends Entity
 	{
-		//[Embed(source="../assets/images/Laser.png")] protected static var imgLaser:Class;
+		[Embed(source="../assets/images/Glow.png")] protected static var imgGlow:Class;
+		
 		public static const NONE:uint = 0;
 		public static const ENEMY:uint = 1;
 		public static const BULLET:uint = 2;
@@ -24,6 +25,7 @@ package
 		public var lineColor:uint = FlxG.WHITE;
 		public var speedDecay:Number = 0.92;
 		public var maxSpeed:Number;
+		public var isGlowing:Boolean = false;
 
 		public function Particle(X:Number = 0, Y:Number = 0)
 		{
@@ -31,15 +33,23 @@ package
 			max += 1;
 			
 			angle = 0;
-			radius = 0;
-			width = height = 1;
+			radius = 0;			
 			kill();
+			loadGraphic(imgGlow);
+			width = height = 20;
+			offset.x = offset.y = 10;
+			alpha = 1;
 		}
 		
 		override public function update():void
 		{
 			super.update();
-			
+			if (isGlowing)
+			{
+				var _lifetime:Number = maxLifespan - lifespan;
+				if (_lifetime > 1.25) alpha = 0;
+				else alpha = 0.2 * ((1.25 - _lifetime) / 1.25);
+			}
 			lifespan -= FlxG.elapsed;
 			if(lifespan <= 0) kill();
 			if(lifespan <= 0) return;
@@ -86,7 +96,7 @@ package
 		override public function draw():void
 		{
 			var _minSpeedRatio:Number = 0.8;
-			//super.draw();
+			if (isGlowing) super.draw();
 			var _startX:Number = position.x - 0.5 * lineScale * velocity.x;
 			var _startY:Number = position.y - 0.5 * lineScale * velocity.y;
 			var _endX:Number = position.x + 0.5 * lineScale * velocity.x;
@@ -122,6 +132,7 @@ package
 		override public function reset(X:Number, Y:Number):void
 		{
 			super.reset(X, Y);
+			isGlowing = false;
 			lifespan = maxLifespan;
 			if (!alive) activeCount += 1;
 			visible = true;

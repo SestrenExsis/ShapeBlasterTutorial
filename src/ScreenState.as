@@ -178,7 +178,7 @@ package
 			else return false;
 		}
 		
-		public static function makeParticle(Type:uint, PositionX:Number, PositionY:Number, Angle:Number, Speed:Number, Color:uint = FlxG.WHITE):Boolean
+		public static function makeParticle(Type:uint, PositionX:Number, PositionY:Number, Angle:Number, Speed:Number, Color:uint = FlxG.WHITE, Glowing:Boolean = false):Boolean
 		{
 			Particle.index += 1;
 			if (Particle.index >= Particle.max) Particle.index = 0;
@@ -191,6 +191,7 @@ package
 			_particle.lineColor = Color;
 			_particle.setVelocity((Angle * Math.PI) / 180, Speed);
 			_particle.maxSpeed = Speed;
+			_particle.isGlowing = Glowing;
 			return _overwritten;
 		}
 		
