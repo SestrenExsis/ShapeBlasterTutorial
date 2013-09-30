@@ -18,6 +18,7 @@ package
 		private var _point:Point;
 		
 		//public static var canvas:Sprite;
+		private static var grid:Grid;
 		public static var blackholes:FlxGroup;
 		private static var particles:FlxGroup;
 		private static var entities:FlxGroup;
@@ -36,6 +37,11 @@ package
 			super.create();
 			GameInput.create();
 			GameSound.create();
+			
+			var _maxGridPoints:int = 1600;
+			var _spacing:Number = Math.sqrt((FlxG.width * FlxG.height) / _maxGridPoints);
+			var _gridRect:Rectangle = new Rectangle(0, 0, FlxG.width, FlxG.height);
+			//grid = new Grid(_gridRect, _spacing, _spacing);
 			
 			particles = new FlxGroup();
 			for (i = 0; i < 2000; i++) particles.add(new Particle());
