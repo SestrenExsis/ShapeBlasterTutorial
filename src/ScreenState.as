@@ -41,7 +41,7 @@ package
 			var _maxGridPoints:int = 1600;
 			var _spacing:Number = Math.sqrt((FlxG.width * FlxG.height) / _maxGridPoints);
 			var _gridRect:Rectangle = new Rectangle(0, 0, FlxG.width, FlxG.height);
-			//grid = new Grid(_gridRect, _spacing, _spacing);
+			grid = new Grid(_gridRect, _spacing, _spacing);
 			
 			particles = new FlxGroup();
 			for (i = 0; i < 2000; i++) particles.add(new Particle());
@@ -80,6 +80,8 @@ package
 			GameInput.update();
 			
 			super.update();
+			grid.update();
+			
 			cursor.x = FlxG.mouse.x;
 			cursor.y = FlxG.mouse.y;
 			

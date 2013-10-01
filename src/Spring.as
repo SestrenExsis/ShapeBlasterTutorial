@@ -37,8 +37,8 @@ package
 			var _forceX:Number = stiffness * _x - _dvX * damping;
 			var _forceY:Number = stiffness * _y - _dvY * damping;
 			
-			end1.ApplyForce(-_forceX, -_forceY);
-			end2.ApplyForce(_forceX, _forceY);
+			end1.applyForce(-_forceX, -_forceY);
+			end2.applyForce(_forceX, _forceY);
 		}
 	}
 }

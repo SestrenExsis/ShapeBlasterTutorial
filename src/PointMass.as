@@ -19,13 +19,13 @@ package
 			inverseMass = InverseMass;
 		}
 		
-		public function ApplyForce(ForceX:Number, ForceY:Number):void
+		public function applyForce(ForceX:Number, ForceY:Number):void
 		{
 			acceleration.x += ForceX * inverseMass;
 			acceleration.y += ForceY * inverseMass;
 		}
 		
-		public function IncreaseDamping(Factor:Number):void
+		public function increaseDamping(Factor:Number):void
 		{
 			damping *= Factor;
 		}
