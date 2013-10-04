@@ -41,8 +41,8 @@ package
 		override public function draw():void
 		{
 			super.draw();
-			FlxG.camera.screen.drawLine(position.x - 2, position.y - 2, position.x + 2, position.y + 2, 0xff0000, 2);
-			FlxG.camera.screen.drawLine(position.x - 2, position.y + 2, position.x + 2, position.y - 2, 0xff0000, 2);
+			//FlxG.camera.screen.drawLine(position.x - 2, position.y - 2, position.x + 2, position.y + 2, 0xff0000, 2);
+			//FlxG.camera.screen.drawLine(position.x - 2, position.y + 2, position.x + 2, position.y - 2, 0xff0000, 2);
 		}
 		
 		override public function update():void

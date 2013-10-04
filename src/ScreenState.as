@@ -1,6 +1,7 @@
 package
 {
 	import flash.display.Sprite;
+	import flash.display.Graphics;
 	import flash.filters.BitmapFilterQuality;
 	import flash.filters.BlurFilter;
 	import flash.geom.Point;
@@ -38,13 +39,11 @@ package
 			GameInput.create();
 			GameSound.create();
 			
-			var _maxGridPoints:int = 1600;
-			var _spacing:Number = Math.sqrt((FlxG.width * FlxG.height) / _maxGridPoints);
 			var _gridRect:Rectangle = new Rectangle(0, 0, FlxG.width, FlxG.height);
-			grid = new Grid(_gridRect, _spacing, _spacing);
+			grid = new Grid(_gridRect, FlxG.width / 20, FlxG.height / 20);
 			
 			particles = new FlxGroup();
-			for (i = 0; i < 2000; i++) particles.add(new Particle());
+			for (i = 0; i < 1000; i++) particles.add(new Particle());
 			add(particles);
 						
 			entities = new FlxGroup();
@@ -101,11 +100,19 @@ package
 		
 		override public function draw():void
 		{
-			super.draw();
+			var gfx:Graphics = FlxG.flashGfx;
+			gfx.clear();
+			grid.draw();
+			FlxG.camera.screen.pixels.draw(FlxG.flashGfxSprite);
+			//FlxG.camera.screen.dirty = true;
 			
-			_fx.stamp(FlxG.camera.screen);
-			FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
-			_fx.draw();
+			gfx.clear();
+			super.draw();
+			FlxG.camera.screen.pixels.draw(FlxG.flashGfxSprite);
+			FlxG.camera.screen.dirty = true;
+			//_fx.stamp(FlxG.camera.screen);
+			//FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
+			//_fx.draw();
 		}
 		
 		public function handleCollision(Object1:FlxObject, Object2:FlxObject):void

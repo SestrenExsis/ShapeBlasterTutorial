@@ -1,6 +1,7 @@
 package
 {
 	import org.flixel.*;
+	import flash.display.Graphics;
 	
 	public class Particle extends Entity
 	{
@@ -95,6 +96,8 @@ package
 		
 		override public function draw():void
 		{
+			var gfx:Graphics = FlxG.flashGfx;
+			
 			var _minSpeedRatio:Number = 0.8;
 			if (isGlowing) super.draw();
 			var _startX:Number = position.x - 0.5 * lineScale * velocity.x;
@@ -114,7 +117,10 @@ package
 			//else if (_speedRatio > 0.25) _speedRatio = 2;
 			//else _speedRatio = 1;
 			
-			FlxG.camera.screen.drawLine(_startX, _startY, _endX, _endY, (_r << 16) | (_g << 8) | _b, 2);
+			gfx.lineStyle(2, (_r << 16) | (_g << 8) | _b);
+			gfx.moveTo(_startX,_startY);
+			gfx.lineTo(_endX,_endY);
+			//FlxG.camera.screen.drawLine(_startX, _startY, _endX, _endY, (_r << 16) | (_g << 8) | _b, 2);
 		}
 		
 		override public function kill():void
