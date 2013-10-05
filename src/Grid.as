@@ -15,7 +15,7 @@ package
 		
 		public function Grid(GridRectangle:Rectangle, NumColumns:Number, NumRows:Number)
 		{
-			var springList:Array = new Array();
+			springs = [];
 			numColumns = NumColumns;
 			numRows = NumRows;
 			
@@ -44,29 +44,29 @@ package
 				for (_x = 0; _x < numColumns; _x++) 
 				{ 
 					_index = _y * (numColumns + 1) + _x;
-					if (_x == 0 || _y == 0 || _x == numColumns - 1 || _y == numRows - 1) // anchor the border of the grid 
-						springList.push(new Spring(fixedPoints[_index], points[_index], 0.1, 0.1)); 
-					else if (_x % 3 == 0 && _y % 3 == 0)                                  // loosely anchor 1/9th of the point masses 
-						springList.push(new Spring(fixedPoints[_index], points[_index], 0.002, 0.02));
+					if (_x == 0 || _y == 0 || _x == numColumns || _y == numRows) // anchor the border of the grid 
+						springs.push(new Spring(fixedPoints[_index], points[_index], 0.1, 0.1)); 
+					else if (_x % 4 == 0 && _y % 4 == 0) // loosely anchor 1/16th of the point masses 
+						springs.push(new Spring(fixedPoints[_index], points[_index], 0.002, 0.02));
 					
 					var _stiffness:Number = 0.28; 
 					var _damping:Number = 0.06; 
-					if (_x > 0)
-						springList.push(new Spring(points[_y * (numColumns + 1) + _x - 1], points[_index], _stiffness, _damping));
-					if (_y > 0)
-						springList.push(new Spring(points[(_y - 1) * (numColumns + 1) + _x], points[_index], _stiffness, _damping));
+					if (_x < numColumns)
+						springs.push(new Spring(points[_index + 1], points[_index], _stiffness, _damping));
+					if (_y < numRows)
+						springs.push(new Spring(points[_index + (numColumns + 1)], points[_index], _stiffness, _damping));
 				}
 			}
-			springs = springList.concat();
+			//springs = springList.concat();
 		}
 		
 		public function update():void
 		{
-			//for each (var spring:Spring in springs)
-			//spring.update();
+			for each (var spring:Spring in springs)
+				spring.update();
 			
-			//for each (var mass:PointMass in points)
-			//mass.update();
+			for each (var mass:PointMass in points)
+				mass.update();
 		}
 		
 		public function draw():void
@@ -120,7 +120,7 @@ package
 			}
 		}
 		
-		public function applyImplosiveForce(Position:FlxPoint, Force:FlxPoint, Radius:Number):void
+		public function applyImplosiveForce(Position:FlxPoint, Force:Number, Radius:Number):void
 		{
 			var _distance:Number;
 			for each (var _mass:PointMass in points)
@@ -129,14 +129,14 @@ package
 				if (_distance < Radius)
 				{
 					_mass.applyForce(
-						10 * Force.x * (Position.x - _mass.position.x) / (100 + _distance * _distance), 
-						10 * Force.y * (Position.y - _mass.position.y) / (100 + _distance * _distance));
+						10 * Force * (Position.x - _mass.position.x) / (100 + _distance * _distance), 
+						10 * Force * (Position.y - _mass.position.y) / (100 + _distance * _distance));
 					_mass.increaseDamping(0.6);
 				}
 			}
 		}
 		
-		public function applyExplosiveForce(Position:FlxPoint, Force:FlxPoint, Radius:Number):void
+		public function applyExplosiveForce(Position:FlxPoint, Force:Number, Radius:Number):void
 		{
 			var _distance:Number;
 			for each (var _mass:PointMass in points)
@@ -145,8 +145,8 @@ package
 				if (_distance < Radius)
 				{
 					_mass.applyForce(
-						100 * Force.x * (_mass.position.x - Position.x) / (10000 + _distance * _distance),
-						100 * Force.y * (_mass.position.y - Position.y) / (10000 + _distance * _distance));
+						100 * Force * (_mass.position.x - Position.x) / (10000 + _distance * _distance),
+						100 * Force * (_mass.position.y - Position.y) / (10000 + _distance * _distance));
 					_mass.increaseDamping(0.6);
 				}
 			}

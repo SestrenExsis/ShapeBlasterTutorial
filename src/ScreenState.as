@@ -19,7 +19,7 @@ package
 		private var _point:Point;
 		
 		//public static var canvas:Sprite;
-		private static var grid:Grid;
+		public static var grid:Grid;
 		public static var blackholes:FlxGroup;
 		private static var particles:FlxGroup;
 		private static var entities:FlxGroup;

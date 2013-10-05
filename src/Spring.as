@@ -17,7 +17,7 @@ package
 			end2 = End2;
 			stiffness = Stiffness;
 			damping = Damping;
-			targetLength = 0.95 * FlxU.getDistance(end1.position, end2.position);
+			targetLength = FlxU.getDistance(end1.position, end2.position); //* 0.95
 		}
 		
 		public function update():void
@@ -27,8 +27,7 @@ package
 			
 			var _length:Number = Math.sqrt(_x * _x + _y * _y)
 			// these springs can only pull, not push
-			if (_length <= targetLength)
-				return;
+			if (_length <= targetLength) return;
 			
 			_x = (_x / _length) * (_length - targetLength);
 			_y = (_y / _length) * (_length - targetLength);
