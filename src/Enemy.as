@@ -60,11 +60,12 @@ package
 			
 			if (type == BLACK_HOLE)
 			{
+				var _angle:Number = (0.720 * getTimer()) % 360;
+				ScreenState.grid.applyImplosiveForce(position, 0.5 * Math.sin(Entity.toRadians(_angle)) * 300 + 600, 200);
 				if (cooldownTimer.finished)
 				{
 					cooldownTimer.stop();
 					cooldownTimer.start(0.02 + 0.08 * FlxG.random());
-					var _angle:Number = (0.720 * getTimer()) % 360;
 					var _color:uint = 0xff00ff;//Entity.HSVtoRGB(5, 0.5, 0.8); // light purple
 					var _speed:Number = 360 + FlxG.random() * 90;
 					var _offsetX:Number = 16 * Math.sin(Entity.toRadians(_angle));

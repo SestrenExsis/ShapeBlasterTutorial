@@ -110,6 +110,7 @@ package
 			super.draw();
 			FlxG.camera.screen.pixels.draw(FlxG.flashGfxSprite);
 			FlxG.camera.screen.dirty = true;
+			
 			//_fx.stamp(FlxG.camera.screen);
 			//FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
 			//_fx.draw();

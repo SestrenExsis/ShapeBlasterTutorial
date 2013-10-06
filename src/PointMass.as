@@ -32,18 +32,20 @@ package
 		
 		public function update():void
 		{
-			updateMotion();
-			/*velocity.x += acceleration.x;
+			//updateMotion();
+			velocity.x += acceleration.x;
 			velocity.y += acceleration.y;
 			position.x += velocity.x * FlxG.elapsed;
 			position.y += velocity.y * FlxG.elapsed;
+			acceleration.x = 0;
+			acceleration.y = 0;
 			if ((velocity.x * velocity.x + velocity.y * velocity.y) < (0.001 * 0.001))
 			{
 				velocity.x = 0;
 				velocity.y = 0;
 			}
 			velocity.x *= damping;
-			velocity.y *= damping;*/
+			velocity.y *= damping;
 			damping = 0.98;
 		}
 		

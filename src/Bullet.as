@@ -32,7 +32,7 @@ package
 				ScreenState.makeExplosion(Particle.BULLET, position.x, position.y, 30, Particle.LOW_SPEED, 0x33ccff, 0x22bbdd);
 				kill();
 			}
-			else ScreenState.grid.applyExplosiveForce(position, 0.005 * Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y), 80);
+			else ScreenState.grid.applyExplosiveForce(position, 0.5 * Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y), 80);
 		}
 		
 		override public function destroy():void

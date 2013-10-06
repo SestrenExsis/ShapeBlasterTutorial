@@ -17,7 +17,7 @@ package
 			end2 = End2;
 			stiffness = Stiffness;
 			damping = Damping;
-			targetLength = FlxU.getDistance(end1.position, end2.position); //* 0.95
+			targetLength = 0.95 * FlxU.getDistance(end1.position, end2.position);
 		}
 		
 		public function update():void
