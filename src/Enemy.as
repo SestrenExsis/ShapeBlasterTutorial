@@ -61,7 +61,7 @@ package
 			if (type == BLACK_HOLE)
 			{
 				var _angle:Number = (0.720 * getTimer()) % 360;
-				ScreenState.grid.applyImplosiveForce(position, 0.5 * Math.sin(Entity.toRadians(_angle)) * 300 + 600, 200);
+				ScreenState.grid.applyImplosiveForce(position, 0.5 * Math.sin(Entity.toRadians(_angle)) * 150 + 300, 200);
 				if (cooldownTimer.finished)
 				{
 					cooldownTimer.stop();

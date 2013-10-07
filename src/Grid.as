@@ -13,11 +13,11 @@ package
 		public var fixedPoints:Array;
 		private var numColumns:uint;
 		private var numRows:uint;
-		
-		private var selectedIndex:int = 0;
+		private var _pt:FlxPoint;
 		
 		public function Grid(GridRectangle:Rectangle, NumColumns:Number, NumRows:Number)
 		{
+			_pt = new FlxPoint();
 			springs = [];
 			numColumns = NumColumns;
 			numRows = NumRows;
@@ -64,20 +64,7 @@ package
 		}
 		
 		public function update():void
-		{
-			/*if (FlxG.keys.justPressed("J"))
-			{
-				selectedIndex -= 1;
-				if (selectedIndex < 0) selectedIndex = springs.length;
-				FlxG.log(selectedIndex);
-			}
-			if (FlxG.keys.justPressed("K"))
-			{
-				selectedIndex += 1;
-				if (selectedIndex > springs.length) selectedIndex = 0;
-				FlxG.log(selectedIndex);
-			}*/
-			
+		{	
 			for each (var spring:Spring in springs)
 				spring.update();
 			
@@ -90,42 +77,68 @@ package
 			var gfx:Graphics = FlxG.flashGfx;
 			
 			//Cache line to bitmap
-			var _gridColor:uint = 0x01034f; //new Color(30, 30, 139, 85);   // dark blue
 			var _thickness:uint;
-			var _startX:Number;
-			var _startY:Number;
-			var _color:uint = _gridColor;
+			var _color:uint = 0x01034f;
 			var _index:uint;
-			var _endX:Number;
-			var _endY:Number; 
+			var _upperLeftX:Number;
+			var _upperLeftY:Number;
+			var _upperRightX:Number;
+			var _upperRightY:Number;
+			var _lowerLeftX:Number;
+			var _lowerLeftY:Number;
+			var _lowerRightX:Number;
+			var _lowerRightY:Number;
 			for (var _y:int = 0; _y <= numRows; _y++)
 			{
 				for (var _x:int = 0; _x <= numColumns; _x++)      
 				{
-					//if (_index == selectedIndex) _color = 0xff0000;
-					//else _color = _gridColor;
+					//change this to render row-by-row and column-by-column to save on moveTo() calls
 					_index = _y * (numColumns + 1) + _x;
-					_endX = (points[_index] as PointMass).position.x;
-					_endY = (points[_index] as PointMass).position.y; 
+					
+					if (_x > 0 || _y > 0)
+					{
+						_pt = (points[_index] as PointMass).position;
+						_lowerRightX = _pt.x;
+						_lowerRightY = _pt.y;
+					}
+					
 					if (_x > 0)
 					{
+						_pt = (points[_index - 1] as PointMass).position;
+						_lowerLeftX = _pt.x;
+						_lowerLeftY = _pt.y;
+						
 						if (_y % 4 == 0) gfx.lineStyle(3, _color);
 						else gfx.lineStyle(1, _color);
-						_startX = (points[_index - 1] as PointMass).position.x;
-						_startY = (points[_index - 1] as PointMass).position.y;
-						gfx.moveTo(_startX,_startY);
-						gfx.lineTo(_endX,_endY);
-						//FlxG.camera.screen.drawLine(_startX, _startY, _endX, _endY, _color, _thickness);
+						gfx.moveTo(_lowerLeftX,_lowerLeftY);
+						gfx.lineTo(_lowerRightX,_lowerRightY);
 					}
 					if (_y > 0)
 					{
+						_pt = (points[_index - (numColumns + 1)] as PointMass).position;
+						_upperRightX = _pt.x;
+						_upperRightY = _pt.y;
+						
 						if (_x % 4 == 0) gfx.lineStyle(3, _color);
 						else gfx.lineStyle(1, _color);
-						_startX = (points[_index - (numColumns + 1)] as PointMass).position.x;
-						_startY = (points[_index - (numColumns + 1)] as PointMass).position.y;
-						gfx.moveTo(_startX,_startY);
-						gfx.lineTo(_endX,_endY);
-						//FlxG.camera.screen.drawLine(_startX, _startY, _endX, _endY, _color, _thickness);
+						gfx.moveTo(_upperRightX,_upperRightY);
+						gfx.lineTo(_lowerRightX,_lowerRightY);
+					}
+					if (_x > 0 && _y > 0)
+					{
+						_pt = (points[_index - (numColumns + 1) - 1] as PointMass).position;
+						_upperLeftX = _pt.x;
+						_upperLeftY = _pt.y;
+						
+						gfx.lineStyle(1, _color);
+						
+						//vertical line
+						gfx.moveTo(0.5 * (_upperLeftX + _upperRightX), 0.5 * (_upperLeftY + _upperRightY));
+						gfx.lineTo(0.5 * (_lowerLeftX + _lowerRightX), 0.5 * (_lowerLeftY + _lowerRightY));
+						
+						//horizontal line
+						gfx.moveTo(0.5 * (_upperLeftX + _lowerLeftX), 0.5 * (_upperLeftY + _lowerLeftY));
+						gfx.lineTo(0.5 * (_upperRightX + _lowerRightX), 0.5 * (_upperRightY + _lowerRightY));
 					}
 				}
 			}
