@@ -101,7 +101,6 @@ package
 						_lowerRightX = _pt.x;
 						_lowerRightY = _pt.y;
 					}
-					
 					if (_x > 0)
 					{
 						_pt = (points[_index - 1] as PointMass).position;
@@ -139,6 +138,7 @@ package
 						//horizontal line
 						gfx.moveTo(0.5 * (_upperLeftX + _lowerLeftX), 0.5 * (_upperLeftY + _lowerLeftY));
 						gfx.lineTo(0.5 * (_upperRightX + _lowerRightX), 0.5 * (_upperRightY + _lowerRightY));
+						//gfx.
 					}
 				}
 			}
@@ -186,6 +186,19 @@ package
 					_mass.increaseDamping(0.6);
 				}
 			}
+		}
+		
+		/* 
+		* Calculates 2D cubic Catmull-Rom spline.
+		* @see http://www.mvps.org/directx/articles/catmull/ 
+		*/ 
+		public function spline(Pt0:FlxPoint, Pt1:FlxPoint, Pt2:FlxPoint, Pt3:FlxPoint, t:Number):FlxPoint 
+		{
+			_pt.x = 0.5 * ((2 * Pt1.x) + t * ((-Pt0.x + Pt2.x) +
+					t * ((2 * Pt0.x - 5 * Pt1.x + 4 * Pt2.x - Pt3.x) + t * (-Pt0.x + 3 * Pt1.x - 3 * Pt2.x + Pt3.x))));
+			_pt.y = 0.5 * ((2 * Pt1.y) + t * (( -Pt0.y + Pt2.y) +
+					t * ((2 * Pt0.y - 5 * Pt1.y + 4 * Pt2.y - Pt3.y) + t * (-Pt0.y + 3 * Pt1.y - 3 * Pt2.y + Pt3.y))));
+			return _pt;			
 		}
 	}
 }
