@@ -2,6 +2,7 @@ package
 {
 	
 	import flash.display.Graphics;
+	import flash.display.GraphicsPathCommand;
 	import flash.geom.Rectangle;
 	
 	import org.flixel.*;
@@ -15,12 +16,46 @@ package
 		private var numRows:uint;
 		private var _pt:FlxPoint;
 		
+		private var lineCommands:Vector.<int>;
+		private var lineData:Vector.<Number>;
+		private var useDrawPath:Boolean = false;
+		
 		public function Grid(GridRectangle:Rectangle, NumColumns:Number, NumRows:Number)
 		{
 			_pt = new FlxPoint();
 			springs = [];
 			numColumns = NumColumns;
 			numRows = NumRows;
+			var _n:uint = (numColumns + 1) * (numRows + 1);
+			
+			var _index:uint;
+			lineCommands = new Vector.<int>(2 * (1 + numColumns) * (1 + numRows), true);
+			lineData = new Vector.<Number>(2 * lineCommands.length, true);
+			for (var _y:int = 0; _y <= numRows; _y++)
+			{
+				for (var _x:int = 0; _x <= numColumns; _x++)
+				{
+					_index = _y * (numColumns + 1) + _x;
+					if (_x == 0) lineCommands[_index] = GraphicsPathCommand.MOVE_TO;
+					else lineCommands[_index] = GraphicsPathCommand.LINE_TO;
+					
+					lineData[2 * _index] = _x * (FlxG.width / numColumns);
+					lineData[2 * _index + 1] = _y * (FlxG.height / numRows);
+				}
+			}
+			
+			for (_x = 0; _x <= numColumns; _x++)
+			{
+				for (_y = 0; _y <= numRows; _y++)
+				{
+					_index = _x * (numRows + 1) + _y;
+					if (_y == 0) lineCommands[_index + _n] = GraphicsPathCommand.MOVE_TO;
+					else lineCommands[_index + _n] = GraphicsPathCommand.LINE_TO;
+					
+					lineData[2 * _index + 2 * _n] = _x * (FlxG.width / numColumns);
+					lineData[2 * _index + 2 * _n + 1] = _y * (FlxG.height / numRows);
+				}
+			}
 			
 			points = [];
 			// these fixed points will be used to anchor the grid to fixed positions on the screen
@@ -29,9 +64,9 @@ package
 			// create the point masses
 			var _cellWidth:Number = GridRectangle.width / numColumns;
 			var _cellHeight:Number = GridRectangle.height / numRows;
-			for (var _y:int = 0; _y <= numRows; _y++)
+			for (_y = 0; _y <= numRows; _y++)
 			{
-				for (var _x:int = 0; _x <= numColumns; _x++)
+				for (_x = 0; _x <= numColumns; _x++)
 				{
 					var _xx:Number = GridRectangle.left + _x * _cellWidth;
 					var _yy:Number = GridRectangle.top + _y * _cellHeight;
@@ -40,7 +75,6 @@ package
 				}
 			}
 			
-			var _index:uint;
 			// link the point masses with springs
 			for (_y = 0; _y <= numRows; _y++)
 			{
@@ -65,11 +99,33 @@ package
 		
 		public function update():void
 		{	
-			for each (var spring:Spring in springs)
-				spring.update();
+			if (FlxG.keys.justPressed("P")) useDrawPath = !useDrawPath;
 			
-			for each (var mass:PointMass in points)
-				mass.update();
+			for each (var spring:Spring in springs) spring.update();
+			for each (var mass:PointMass in points) mass.update();
+			
+			if (useDrawPath)
+			{
+				var _n:uint = (numColumns + 1) * (numRows + 1);
+				var _index:uint;
+				var _indexTranspose:uint;
+				for (var _y:int = 0; _y <= numRows; _y++)
+				{
+					for (var _x:int = 0; _x <= numColumns; _x++)
+					{
+						_index = _y * (numColumns + 1) + _x;
+						_indexTranspose = _x * (numRows + 1) + _y;
+						
+						_pt = (points[_index] as PointMass).position;
+						
+						lineData[2 * _index] = _pt.x;
+						lineData[2 * _index + 1] = _pt.y;
+						
+						lineData[2 * _indexTranspose + 2 * _n] = _pt.x;
+						lineData[2 * _indexTranspose + 2 * _n + 1] = _pt.y;
+					}
+				}
+			}
 		}
 		
 		public function draw():void
@@ -78,7 +134,7 @@ package
 			
 			//Cache line to bitmap
 			var _thickness:uint;
-			var _color:uint = 0x01034f;
+			var _color:uint = 0Xff0000;//0x01034f;
 			var _index:uint;
 			var _upperLeftX:Number;
 			var _upperLeftY:Number;
@@ -88,62 +144,89 @@ package
 			var _lowerLeftY:Number;
 			var _lowerRightX:Number;
 			var _lowerRightY:Number;
-			for (var _y:int = 0; _y <= numRows; _y++)
+			
+			if (useDrawPath)
 			{
-				for (var _x:int = 0; _x <= numColumns; _x++)      
+				gfx.lineStyle(1, _color);
+				gfx.drawPath(lineCommands, lineData);
+			}
+			else
+			{
+				for (var _y:int = 0; _y <= numRows; _y++)
 				{
-					//change this to render row-by-row and column-by-column to save on moveTo() calls
-					_index = _y * (numColumns + 1) + _x;
+					if (_y % 4 == 0) gfx.lineStyle(3, _color);
+					else gfx.lineStyle(1, _color);
 					
-					if (_x > 0 || _y > 0)
+					_index = _y * (numColumns + 1);
+					_pt = (points[_index] as PointMass).position;
+					gfx.moveTo(_pt.x, _pt.y);
+					for (var _x:int = 1; _x <= numColumns; _x++)      
 					{
-						_pt = (points[_index] as PointMass).position;
-						_lowerRightX = _pt.x;
-						_lowerRightY = _pt.y;
+						_pt = (points[_index + _x] as PointMass).position;
+						gfx.lineTo(_pt.x, _pt.y);
 					}
-					if (_x > 0)
-					{
-						_pt = (points[_index - 1] as PointMass).position;
-						_lowerLeftX = _pt.x;
-						_lowerLeftY = _pt.y;
-						
-						if (_y % 4 == 0) gfx.lineStyle(3, _color);
-						else gfx.lineStyle(1, _color);
-						gfx.moveTo(_lowerLeftX,_lowerLeftY);
-						gfx.lineTo(_lowerRightX,_lowerRightY);
-					}
+					
 					if (_y > 0)
 					{
+						gfx.lineStyle(1, _color);
+						_pt = (points[_index] as PointMass).position;
+						_lowerLeftX = _pt.x;
+						_lowerLeftY = _pt.y;
 						_pt = (points[_index - (numColumns + 1)] as PointMass).position;
-						_upperRightX = _pt.x;
-						_upperRightY = _pt.y;
-						
-						if (_x % 4 == 0) gfx.lineStyle(3, _color);
-						else gfx.lineStyle(1, _color);
-						gfx.moveTo(_upperRightX,_upperRightY);
-						gfx.lineTo(_lowerRightX,_lowerRightY);
-					}
-					if (_x > 0 && _y > 0)
-					{
-						_pt = (points[_index - (numColumns + 1) - 1] as PointMass).position;
 						_upperLeftX = _pt.x;
 						_upperLeftY = _pt.y;
-						
-						gfx.lineStyle(1, _color);
-						
-						//vertical line
-						gfx.moveTo(0.5 * (_upperLeftX + _upperRightX), 0.5 * (_upperLeftY + _upperRightY));
-						gfx.lineTo(0.5 * (_lowerLeftX + _lowerRightX), 0.5 * (_lowerLeftY + _lowerRightY));
-						
-						//horizontal line
 						gfx.moveTo(0.5 * (_upperLeftX + _lowerLeftX), 0.5 * (_upperLeftY + _lowerLeftY));
-						gfx.lineTo(0.5 * (_upperRightX + _lowerRightX), 0.5 * (_upperRightY + _lowerRightY));
-						//gfx.
+						
+						for (_x = 1; _x <= numColumns; _x++)
+						{
+							_pt = (points[_index + _x] as PointMass).position;
+							_lowerLeftX = _pt.x;
+							_lowerLeftY = _pt.y;
+							_pt = (points[_index - (numColumns + 1) + _x] as PointMass).position;
+							_upperLeftX = _pt.x;
+							_upperLeftY = _pt.y;
+							gfx.lineTo(0.5 * (_upperLeftX + _lowerLeftX), 0.5 * (_upperLeftY + _lowerLeftY));
+						}
+					}
+				}
+				_y = 0;
+				for (_x = 0; _x <= numColumns; _x++)
+				{
+					if (_x % 4 == 0) gfx.lineStyle(3, _color);
+					else gfx.lineStyle(1, _color);
+					
+					_pt = (points[_x] as PointMass).position;
+					gfx.moveTo(_pt.x, _pt.y);
+					for (_y = 1; _y <= numRows; _y++)      
+					{
+						_pt = (points[_y * (numColumns + 1) + _x] as PointMass).position;
+						gfx.lineTo(_pt.x, _pt.y);
+					}
+					
+					if (_x > 0)
+					{
+						gfx.lineStyle(1, _color);
+						_pt = (points[_x - 1] as PointMass).position;
+						_upperLeftX = _pt.x;
+						_upperLeftY = _pt.y;
+						_pt = (points[_x] as PointMass).position;
+						_upperRightX = _pt.x;
+						_upperRightY = _pt.y;
+						gfx.moveTo(0.5 * (_upperLeftX + _upperRightX), 0.5 * (_upperLeftY + _upperRightY));
+						for (_y = 1; _y <= numRows; _y++)
+						{
+							_index = _y * (numColumns + 1) + _x;
+							_pt = (points[_index - 1] as PointMass).position;
+							_upperLeftX = _pt.x;
+							_upperLeftY = _pt.y;
+							_pt = (points[_index] as PointMass).position;
+							_upperRightX = _pt.x;
+							_upperRightY = _pt.y;
+							gfx.lineTo(0.5 * (_upperLeftX + _upperRightX), 0.5 * (_upperLeftY + _upperRightY));
+						}
 					}
 				}
 			}
-			//FlxG.camera.screen.pixels.draw(FlxG.flashGfxSprite);
-			//FlxG.camera.screen.dirty = true;
 		}
 		
 		public function applyDirectedForce(Position:FlxPoint, Force:FlxPoint, Radius:Number):void
