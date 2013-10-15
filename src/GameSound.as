@@ -38,14 +38,14 @@ package
 		
 		public static function create():void
 		{
-			FlxG.playMusic(sfxMusic, 0.6);
-			FlxG.volume = 0.1;
+			FlxG.playMusic(sfxMusic, 0.0);
+			FlxG.volume = 0.0;
 		}
 		
 		public static function randomSound(Sounds:Array, VolumeMultiplier:Number = 1.0):void
 		{
 			var _seed:Number = Math.floor(Sounds.length * Math.random());
-			FlxG.play(Sounds[_seed], VolumeMultiplier, false, false);
+			FlxG.play(Sounds[_seed], FlxG.volume * VolumeMultiplier, false, false);
 		}
 	}
 }

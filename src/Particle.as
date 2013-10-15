@@ -1,7 +1,8 @@
 package
 {
-	import org.flixel.*;
 	import flash.display.Graphics;
+	
+	import org.flixel.*;
 	
 	public class Particle extends Entity
 	{
@@ -20,6 +21,8 @@ package
 		public static var activeCount:int = 0;
 		public static var max:uint = 0;
 		public static var maxLifespan:Number = 3.25;
+		
+		public static var renderParticles:Boolean = true;
 		
 		public var lifespan:Number;
 		public var lineScale:Number = 0.05;
@@ -96,6 +99,7 @@ package
 		
 		override public function draw():void
 		{
+			if (!renderParticles) return;
 			var gfx:Graphics = FlxG.flashGfx;
 			
 			var _minSpeedRatio:Number = 0.8;

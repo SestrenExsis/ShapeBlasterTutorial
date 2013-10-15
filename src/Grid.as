@@ -14,18 +14,22 @@ package
 		public var fixedPoints:Array;
 		private var numColumns:uint;
 		private var numRows:uint;
+		private var majorGridSize:int;
 		private var _pt:FlxPoint;
 		
 		private var lineCommands:Vector.<int>;
 		private var lineData:Vector.<Number>;
 		private var useDrawPath:Boolean = false;
+		private var moveGridPoints:Boolean = true;
+		private var renderGrid:Boolean = true;
 		
-		public function Grid(GridRectangle:Rectangle, NumColumns:Number, NumRows:Number)
+		public function Grid(GridRectangle:Rectangle, NumColumns:Number, NumRows:Number, MajorGridSize:int = 4)
 		{
 			_pt = new FlxPoint();
 			springs = [];
 			numColumns = NumColumns;
 			numRows = NumRows;
+			majorGridSize = MajorGridSize;
 			var _n:uint = (numColumns + 1) * (numRows + 1);
 			
 			var _index:uint;
@@ -100,6 +104,9 @@ package
 		public function update():void
 		{	
 			if (FlxG.keys.justPressed("P")) useDrawPath = !useDrawPath;
+			if (FlxG.keys.justPressed("O")) Particle.renderParticles = !Particle.renderParticles;
+			if (FlxG.keys.justPressed("I")) moveGridPoints = !moveGridPoints;
+			if (FlxG.keys.justPressed("U")) renderGrid = !renderGrid;
 			
 			for each (var spring:Spring in springs) spring.update();
 			for each (var mass:PointMass in points) mass.update();
@@ -116,13 +123,16 @@ package
 						_index = _y * (numColumns + 1) + _x;
 						_indexTranspose = _x * (numRows + 1) + _y;
 						
-						_pt = (points[_index] as PointMass).position;
-						
-						lineData[2 * _index] = _pt.x;
-						lineData[2 * _index + 1] = _pt.y;
-						
-						lineData[2 * _indexTranspose + 2 * _n] = _pt.x;
-						lineData[2 * _indexTranspose + 2 * _n + 1] = _pt.y;
+						if (moveGridPoints)
+						{
+							_pt = (points[_index] as PointMass).position;
+							
+							lineData[2 * _index] = _pt.x;
+							lineData[2 * _index + 1] = _pt.y;
+							
+							lineData[2 * _indexTranspose + 2 * _n] = _pt.x;
+							lineData[2 * _indexTranspose + 2 * _n + 1] = _pt.y;
+						}
 					}
 				}
 			}
@@ -131,6 +141,7 @@ package
 		public function draw():void
 		{
 			var gfx:Graphics = FlxG.flashGfx;
+			gfx.clear();
 			
 			//Cache line to bitmap
 			var _thickness:uint;
@@ -148,13 +159,14 @@ package
 			if (useDrawPath)
 			{
 				gfx.lineStyle(1, _color);
-				gfx.drawPath(lineCommands, lineData);
+				
+				if (renderGrid) gfx.drawPath(lineCommands, lineData);
 			}
-			else
+			else if (renderGrid)
 			{
 				for (var _y:int = 0; _y <= numRows; _y++)
 				{
-					if (_y % 4 == 0) gfx.lineStyle(3, _color);
+					if (_y % majorGridSize == 0) gfx.lineStyle(3, _color);
 					else gfx.lineStyle(1, _color);
 					
 					_index = _y * (numColumns + 1);
@@ -192,7 +204,7 @@ package
 				_y = 0;
 				for (_x = 0; _x <= numColumns; _x++)
 				{
-					if (_x % 4 == 0) gfx.lineStyle(3, _color);
+					if (_x % majorGridSize == 0) gfx.lineStyle(3, _color);
 					else gfx.lineStyle(1, _color);
 					
 					_pt = (points[_x] as PointMass).position;
