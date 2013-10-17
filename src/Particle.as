@@ -21,13 +21,12 @@ package
 		public static var activeCount:int = 0;
 		public static var max:uint = 0;
 		public static var maxLifespan:Number = 3.25;
-		
-		public static var renderParticles:Boolean = true;
-		
+				
 		public var lifespan:Number;
 		public var lineScale:Number = 0.05;
 		public var lineColor:uint = FlxG.WHITE;
-		public var speedDecay:Number = 0.92;
+		public var speedDecay:Number = 0.90;
+		public var initialSpeed:Number;
 		public var maxSpeed:Number;
 		public var isGlowing:Boolean = false;
 
@@ -55,8 +54,8 @@ package
 				else alpha = 0.2 * ((1.25 - _lifetime) / 1.25);
 			}
 			lifespan -= FlxG.elapsed;
-			if(lifespan <= 0) kill();
-			if(lifespan <= 0) return;
+			if(lifespan <= 0 || (velocity.x * velocity.x + velocity.y * velocity.y) < 1) kill();
+			if(!alive) return;
 			
 			velocity.x = speedDecay * velocity.x;
 			velocity.y = speedDecay * velocity.y;
@@ -72,17 +71,17 @@ package
 						_point.y = blackhole.position.y - position.y;
 						
 						var _distance:Number = Math.sqrt(_point.x * _point.x + _point.y * _point.y);
-						if (_distance < 300)
+						//if (_distance < 300)
 						{
 							_point = GameInput.normalize(_point);
-							velocity.x += 20 * (10000 / (_distance * _distance + 10000)) * _point.x;//10000 * _point.x / (_distance * _distance + 10000);
-							velocity.y += 20 * (10000 / (_distance * _distance + 10000)) * _point.y;//10000 * _point.y / (_distance * _distance + 10000);
+							velocity.x += FlxG.elapsed * 600 * (10000 / (_distance * _distance + 10000)) * _point.x;//10000 * _point.x / (_distance * _distance + 10000);
+							velocity.y += FlxG.elapsed * 600 * (10000 / (_distance * _distance + 10000)) * _point.y;//10000 * _point.y / (_distance * _distance + 10000);
 							
 							// add tangential acceleration for nearby particles
 							if (_distance < 400)
 							{
-								velocity.x += 100 * (100 / (_distance * _distance + 100)) * _point.y;// / _distance;//45 * _point.y / (_distance + 100);
-								velocity.y -= 100 * (100 / (_distance * _distance + 100)) * _point.x;// / _distance;//-45 * _point.x / (_distance + 100);
+								velocity.x += FlxG.elapsed * 3000 * (100 / (_distance * _distance + 100)) * _point.y;// / _distance;//45 * _point.y / (_distance + 100);
+								velocity.y -= FlxG.elapsed * 3000 * (100 / (_distance * _distance + 100)) * _point.x;// / _distance;//-45 * _point.x / (_distance + 100);
 							}
 						}
 					}
@@ -99,7 +98,6 @@ package
 		
 		override public function draw():void
 		{
-			if (!renderParticles) return;
 			var gfx:Graphics = FlxG.flashGfx;
 			
 			var _minSpeedRatio:Number = 0.8;
@@ -108,23 +106,18 @@ package
 			var _startY:Number = position.y - 0.5 * lineScale * velocity.y;
 			var _endX:Number = position.x + 0.5 * lineScale * velocity.x;
 			var _endY:Number = position.y + 0.5 * lineScale * velocity.y;
-			var _speedRatio:Number = _minSpeedRatio + (1 - _minSpeedRatio) * ((velocity.x * velocity.x + velocity.y * velocity.y) / (maxSpeed * maxSpeed));
-			var _lifespanRatio:Number = lifespan / maxLifespan;
-			var _r:int = interpolate(0x00, 0xff & (lineColor >> 16), _lifespanRatio);
-			var _g:int = interpolate(0x00, 0xff & (lineColor >> 8), _lifespanRatio);
-			var _b:int = interpolate(0x00, 0xff & lineColor, _lifespanRatio);
-			_r = interpolate(0xff, _r, 0.9);
-			_g = interpolate(0xff, _g, 0.9);
-			_b = interpolate(0xff, _b, 0.9);
-			_speedRatio = (_speedRatio - _minSpeedRatio) / (1 - _minSpeedRatio);
-			//if (_speedRatio > 0.5) _speedRatio = 3;
-			//else if (_speedRatio > 0.25) _speedRatio = 2;
-			//else _speedRatio = 1;
+			var _lifespanRatio:Number = (lifespan * lifespan) / Math.pow(maxLifespan, 1.25);
+			var _speedRatio:Number = (velocity.x * velocity.x + velocity.y * velocity.y) / Math.pow(initialSpeed, 1.25);
+			if (_speedRatio > _lifespanRatio) _speedRatio = _lifespanRatio;
+			if (_speedRatio > 1) _speedRatio = 1;
+			var _color:uint = Entity.interpolateRGB(0x000000, lineColor, _speedRatio);
+			//var _r:int = interpolate(0x00, 0xff & (lineColor >> 16), _speedRatio);
+			//var _g:int = interpolate(0x00, 0xff & (lineColor >> 8), _speedRatio);
+			//var _b:int = interpolate(0x00, 0xff & lineColor, _speedRatio);
 			
-			gfx.lineStyle(2, (_r << 16) | (_g << 8) | _b);
+			gfx.lineStyle(2, _color);//(_r << 16) | (_g << 8) | _b);
 			gfx.moveTo(_startX,_startY);
 			gfx.lineTo(_endX,_endY);
-			//FlxG.camera.screen.drawLine(_startX, _startY, _endX, _endY, (_r << 16) | (_g << 8) | _b, 2);
 		}
 		
 		override public function kill():void
@@ -157,8 +150,7 @@ package
 		{
 			velocity.x = Magnitude * Math.cos(Angle);
 			velocity.y = Magnitude * Math.sin(Angle);
-			//drag.x = Math.abs(speedDecay * velocity.x);
-			//drag.y = Math.abs(speedDecay * velocity.y);
+			initialSpeed = Magnitude;
 		}
 	}
 }

@@ -43,10 +43,10 @@ package
 			GameSound.create();
 			
 			var _gridRect:Rectangle = new Rectangle(0, 0, FlxG.width, FlxG.height);
-			grid = new Grid(_gridRect, FlxG.width / 30, FlxG.height / 30, 4);
+			grid = new Grid(_gridRect, FlxG.width / 20, FlxG.height / 20, 8);
 			
 			particles = new FlxGroup();
-			for (i = 0; i < 1000; i++) particles.add(new Particle());
+			for (i = 0; i < 2500; i++) particles.add(new Particle());
 			//add(particles);
 						
 			entities = new FlxGroup();
@@ -74,7 +74,7 @@ package
 			_rect = new Rectangle(0, 0, FlxG.width, FlxG.height);
 			_point = new Point();
 			
-			blur = new BlurFilter(6, 6, BitmapFilterQuality.LOW);
+			blur = new BlurFilter(8, 8, BitmapFilterQuality.LOW);
 		}
 		
 		override public function update():void
@@ -113,9 +113,9 @@ package
 			
 			super.draw();
 			
-			//_fx.stamp(FlxG.camera.screen);
-			//FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
-			//_fx.draw();
+			_fx.stamp(FlxG.camera.screen);
+			FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
+			_fx.draw();
 		}
 		
 		public function handleCollision(Object1:FlxObject, Object2:FlxObject):void

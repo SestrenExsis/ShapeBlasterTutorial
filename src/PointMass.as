@@ -32,7 +32,6 @@ package
 		
 		public function update():void
 		{
-			//updateMotion();
 			velocity.x += acceleration.x;
 			velocity.y += acceleration.y;
 			position.x += velocity.x * FlxG.elapsed;

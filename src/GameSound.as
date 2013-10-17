@@ -38,8 +38,8 @@ package
 		
 		public static function create():void
 		{
-			FlxG.playMusic(sfxMusic, 0.0);
-			FlxG.volume = 0.0;
+			FlxG.playMusic(sfxMusic, 0.4);
+			FlxG.volume = 0.5;
 		}
 		
 		public static function randomSound(Sounds:Array, VolumeMultiplier:Number = 1.0):void

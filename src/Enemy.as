@@ -99,7 +99,7 @@ package
 			{
 				var hue:Number = (0.180 * getTimer()) % 360;
 				var _color:uint = Entity.HSVtoRGB(hue, 0.25, 1);
-				ScreenState.makeExplosion(Particle.IGNORE_GRAVITY, position.x, position.y, 150, Particle.MEDIUM_SPEED, _color);
+				ScreenState.makeExplosion(Particle.IGNORE_GRAVITY, position.x, position.y, 100, Particle.MEDIUM_SPEED, _color);
 			}
 		}
 		
@@ -122,7 +122,7 @@ package
 				case 5: _color = 0x00ffff; break;
 				default: _color = 0xffffff; break;
 			}
-			ScreenState.makeExplosion(Particle.ENEMY, position.x, position.y, 120, Particle.MEDIUM_SPEED, _color, FlxG.WHITE);
+			ScreenState.makeExplosion(Particle.ENEMY, position.x, position.y, 90, Particle.MEDIUM_SPEED, _color, FlxG.WHITE);
 		}
 		
 		override public function set type(Value:uint):void
@@ -176,8 +176,8 @@ package
 					if (type == BLACK_HOLE)
 					{
 						
-						Object.velocity.x -= 18 * Math.cos(AngleFromCenters);
-						Object.velocity.y -= 18 * Math.sin(AngleFromCenters);
+						Object.velocity.x -= FlxG.elapsed * 1100 * Math.cos(AngleFromCenters);
+						Object.velocity.y -= FlxG.elapsed * 1100 * Math.sin(AngleFromCenters);
 					}
 				}
 			}
@@ -194,7 +194,7 @@ package
 				{
 					if (IsBlackHole)
 					{
-						var GravityStrength:Number = Entity.interpolate(60, 0, Math.sqrt(DistanceSquared) / radius);
+						var GravityStrength:Number = FlxG.elapsed * 15 * Entity.interpolate(60, 0, Math.sqrt(DistanceSquared) / radius);
 						Object.velocity.x += GravityStrength * Math.cos(AngleFromCenters);
 						Object.velocity.y += GravityStrength * Math.sin(AngleFromCenters);
 					}
@@ -202,8 +202,8 @@ package
 					{
 						var XDistance:Number = position.x - Object.position.x;
 						var YDistance:Number = position.y - Object.position.y;
-						velocity.x += 600 * XDistance / (DistanceSquared + 1);
-						velocity.y += 600 * YDistance / (DistanceSquared + 1);
+						velocity.x += FlxG.elapsed * 18000 * XDistance / (DistanceSquared + 1);
+						velocity.y += FlxG.elapsed * 18000 * YDistance / (DistanceSquared + 1);
 					}
 				}
 			}
