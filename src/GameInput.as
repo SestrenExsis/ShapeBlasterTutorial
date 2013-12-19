@@ -1,7 +1,6 @@
 package
 {
 	import org.flixel.*;
-	import PlayerShip;
 	
 	public class GameInput
 	{
@@ -10,6 +9,8 @@ package
 		protected static var _wasBombButtonPressed:Boolean = false;
 		protected static var _mouseLast:FlxPoint;
 		protected static var _aimWithMouse:Boolean = false;
+		
+		public static var lengthBeforeNormalize:Number;
 		
 		public static function create():void
 		{
@@ -34,11 +35,11 @@ package
 		public static function normalize(Point:FlxPoint):FlxPoint
 		{
 			//Normalize the length if the player is aiming diagonally
-			var _length:Number = 1 / Math.sqrt(Point.x * Point.x + Point.y * Point.y); //Do this without the square root to speed it up.
-			if (_length < 1) 
+			lengthBeforeNormalize = Math.sqrt(Point.x * Point.x + Point.y * Point.y);
+			if (lengthBeforeNormalize != 0) 
 			{
-				Point.x *= _length;
-				Point.y *= _length;
+				Point.x /= lengthBeforeNormalize;
+				Point.y /= lengthBeforeNormalize;
 			}
 			
 			return Point;

@@ -23,9 +23,9 @@ package
 		public static var maxLifespan:Number = 3.25;
 				
 		public var lifespan:Number;
-		public var lineScale:Number = 0.05;
+		public var lineScale:Number = 0.06;
 		public var lineColor:uint = FlxG.WHITE;
-		public var speedDecay:Number = 0.90;
+		public var speedDecay:Number = 0.93;
 		public var initialSpeed:Number;
 		public var maxSpeed:Number;
 		public var isGlowing:Boolean = false;
@@ -45,7 +45,7 @@ package
 		}
 		
 		override public function update():void
-		{
+		{			
 			super.update();
 			if (isGlowing)
 			{
@@ -62,7 +62,7 @@ package
 			
 			if (type != IGNORE_GRAVITY)
 			{
-				for (var i:uint = 0; i < ScreenState.blackholes.length; i++) //each (var blackhole:Enemy in ScreenState.blackholes)
+				for (var i:uint = 0; i < ScreenState.blackholes.length; i++)
 				{
 					var blackhole:Enemy = ScreenState.blackholes.members[i];
 					if (blackhole.alive)
@@ -70,52 +70,45 @@ package
 						_point.x = blackhole.position.x - position.x;
 						_point.y = blackhole.position.y - position.y;
 						
-						var _distance:Number = Math.sqrt(_point.x * _point.x + _point.y * _point.y);
-						//if (_distance < 300)
+						_point = GameInput.normalize(_point);
+						var _distance:Number = GameInput.lengthBeforeNormalize;
+						velocity.x += FlxG.elapsed * 600 * (10000 / (_distance * _distance + 10000)) * _point.x;
+						velocity.y += FlxG.elapsed * 600 * (10000 / (_distance * _distance + 10000)) * _point.y;
+						
+						// add tangential acceleration for nearby particles
+						if (_distance < 400)
 						{
-							_point = GameInput.normalize(_point);
-							velocity.x += FlxG.elapsed * 600 * (10000 / (_distance * _distance + 10000)) * _point.x;//10000 * _point.x / (_distance * _distance + 10000);
-							velocity.y += FlxG.elapsed * 600 * (10000 / (_distance * _distance + 10000)) * _point.y;//10000 * _point.y / (_distance * _distance + 10000);
-							
-							// add tangential acceleration for nearby particles
-							if (_distance < 400)
-							{
-								velocity.x += FlxG.elapsed * 3000 * (100 / (_distance * _distance + 100)) * _point.y;// / _distance;//45 * _point.y / (_distance + 100);
-								velocity.y -= FlxG.elapsed * 3000 * (100 / (_distance * _distance + 100)) * _point.x;// / _distance;//-45 * _point.x / (_distance + 100);
-							}
+							velocity.x += FlxG.elapsed * 3000 * (100 / (_distance * _distance + 100)) * _point.y;
+							velocity.y -= FlxG.elapsed * 3000 * (100 / (_distance * _distance + 100)) * _point.x;
 						}
 					}
 				}
 			}
 			
-			// collide with the edges of the screen
+			// If colliding with the edges of the screen, bounce off in the other direction
 			if (position.x < 0) velocity.x = Math.abs(velocity.x); 
 			else if (position.x > FlxG.width) velocity.x = -Math.abs(velocity.x);
-			
 			if (position.y < 0) velocity.y = Math.abs(velocity.y); 
 			else if (position.y > FlxG.height) velocity.y = -Math.abs(velocity.y);
 		}
 		
 		override public function draw():void
 		{
+			if (isGlowing) super.draw(); //used for the PlayerShip's exhaust stream
 			var gfx:Graphics = FlxG.flashGfx;
-			
-			var _minSpeedRatio:Number = 0.8;
-			if (isGlowing) super.draw();
 			var _startX:Number = position.x - 0.5 * lineScale * velocity.x;
 			var _startY:Number = position.y - 0.5 * lineScale * velocity.y;
 			var _endX:Number = position.x + 0.5 * lineScale * velocity.x;
 			var _endY:Number = position.y + 0.5 * lineScale * velocity.y;
+			
+			// As a particle's lifespan increases and/or as it slows down, it slowly fades to black
 			var _lifespanRatio:Number = (lifespan * lifespan) / Math.pow(maxLifespan, 1.25);
 			var _speedRatio:Number = (velocity.x * velocity.x + velocity.y * velocity.y) / Math.pow(initialSpeed, 1.25);
 			if (_speedRatio > _lifespanRatio) _speedRatio = _lifespanRatio;
 			if (_speedRatio > 1) _speedRatio = 1;
 			var _color:uint = Entity.interpolateRGB(0x000000, lineColor, _speedRatio);
-			//var _r:int = interpolate(0x00, 0xff & (lineColor >> 16), _speedRatio);
-			//var _g:int = interpolate(0x00, 0xff & (lineColor >> 8), _speedRatio);
-			//var _b:int = interpolate(0x00, 0xff & lineColor, _speedRatio);
 			
-			gfx.lineStyle(2, _color);//(_r << 16) | (_g << 8) | _b);
+			gfx.lineStyle(3, _color);
 			gfx.moveTo(_startX,_startY);
 			gfx.lineTo(_endX,_endY);
 		}

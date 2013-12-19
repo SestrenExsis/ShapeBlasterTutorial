@@ -1,6 +1,6 @@
 package
 {
-	import org.flixel.FlxGame;
+	import org.flixel.*;
 	import flash.display.StageQuality;
 	[SWF(width="800", height="600", backgroundColor="#888888")]
 	
@@ -8,7 +8,7 @@ package
 	{
 		public function ShapeBlasterTutorial()
 		{
-			super(800, 600, ScreenState, 1.0, 30, 30, true);
+			super(800, 600, ScreenState, 1.0, 60, 60, true);
 			
 			forceDebugger = true;
 			useSystemCursor = false;

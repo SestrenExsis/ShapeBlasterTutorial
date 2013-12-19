@@ -2,7 +2,7 @@
 <actionScriptProperties analytics="false" mainApplicationPath="ShapeBlasterTutorial.as" projectUUID="1d9eb25d-313b-4148-970f-8dea301003b2" version="10">
   <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="true" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
     <compilerSourcePath>
-      <compilerSourcePathEntry kind="1" linkType="1" path="C:/Users/Joshua/Desktop/Dropbox/Programming/Libraries/Flixel"/>
+      <compilerSourcePathEntry kind="1" linkType="1" path="C:/Users/Joshua/Desktop/Dropbox/Libraries/flixel-v2.56"/>
     </compilerSourcePath>
     <libraryPath defaultLinkType="0">
       <libraryPathEntry kind="4" path="">
@@ -40,5 +40,3 @@
   <buildCSSFiles/>
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
 </actionScriptProperties>
-
-

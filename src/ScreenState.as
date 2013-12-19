@@ -13,13 +13,16 @@ package
 	public class ScreenState extends FlxState
 	{
 		[Embed(source="../assets/images/Pointer.png")] protected static var imgPointer:Class;
-		//[Embed(source="http://fonts.googleapis.com/css?family=Nova+Square", fontFamily="Nova Square", embedAsCFF="false")] public var fntNovaSquare:String;
+		
 		private var _fx:FlxSprite;
 		private var blur:BlurFilter;
 		private var _rect:Rectangle;
 		private var _point:Point;
 		private var lastTimeStamp:int = 0;
 		private var currentTimeStamp:int = 0;
+		
+		private var fpsBuffer:Array;
+		private var fpsIndex:uint;
 		
 		public static var grid:Grid;
 		public static var blackholes:FlxGroup;
@@ -42,12 +45,16 @@ package
 			GameInput.create();
 			GameSound.create();
 			
+			fpsBuffer = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+			fpsIndex = 0;
+			
+			// Neither the grid nor the particles group are added to the FlxState here. Instead, their update() and draw() routines will
+			// be called in a custom order.
 			var _gridRect:Rectangle = new Rectangle(0, 0, FlxG.width, FlxG.height);
 			grid = new Grid(_gridRect, FlxG.width / 20, FlxG.height / 20, 8);
 			
 			particles = new FlxGroup();
 			for (i = 0; i < 2500; i++) particles.add(new Particle());
-			//add(particles);
 						
 			entities = new FlxGroup();
 			entities.add(new PlayerShip());
@@ -67,20 +74,19 @@ package
 			displayText.setFormat(null, 16, 0xffffff, "right");
 			add(displayText);
 			
+			//These are used to implement the glow effect.
 			_fx = new FlxSprite();
 			_fx.makeGraphic(FlxG.width, FlxG.height, 0, true);
 			_fx.antialiasing = true;
 			_fx.blend = "screen";
 			_rect = new Rectangle(0, 0, FlxG.width, FlxG.height);
 			_point = new Point();
-			
 			blur = new BlurFilter(8, 8, BitmapFilterQuality.LOW);
 		}
 		
 		override public function update():void
 		{	
 			GameInput.update();
-			
 			super.update();
 			grid.update();
 			particles.update();
@@ -96,23 +102,42 @@ package
 			FlxG.overlap(entities, entities, handleCollision);
 			FlxG.overlap(blackholes, entities, handleCollision);
 			
-			if (PlayerShip.isGameOver) displayText.text = "Game Over\n" + "Your Score: " + 
-				PlayerShip.score + "\n" + "High Score: " + PlayerShip.highScore;
-			else displayText.text = "Lives: " + PlayerShip.lives + "\t\tScore: " + 
-				PlayerShip.score + "\t\tMultiplier: " + PlayerShip.multiplier;
-			displayText.text += "\n" + int(1000 / (getTimer() - lastTimeStamp)) + "fps";
+			// Calculate average framerate over the past 10 frames.
+			if (fpsIndex + 1 >= fpsBuffer.length) fpsIndex = 0;
+			else fpsIndex++;
+			fpsBuffer[fpsIndex] = getTimer() - lastTimeStamp;
+			var _timeTotalInMilliseconds:int = 0;
+			for (var i:int = 0; i < fpsBuffer.length; i++)
+				_timeTotalInMilliseconds += fpsBuffer[i];
 			lastTimeStamp = getTimer();
+			
+			if (PlayerShip.isGameOver) 
+			{
+				displayText.alignment = "center";
+				displayText.offset.y = 16 - 0.5 * FlxG.height;
+				displayText.text = "Game Over\n" + "Your Score: " + PlayerShip.score + "\n" + "High Score: " + PlayerShip.highScore;
+			}
+			else 
+			{
+				displayText.alignment = "right";
+				displayText.offset.y = 0;
+				displayText.text = "Lives: " + PlayerShip.lives + "\t\tScore: " + PlayerShip.score + "\t\tMultiplier: " 
+					+ PlayerShip.multiplier;
+				displayText.text += "\n" + int((500 * fpsBuffer.length) / _timeTotalInMilliseconds) + " fps";
+			}
+			
+
 		}
 		
 		override public function draw():void
 		{
-			//var gfx:Graphics = FlxG.flashGfx;
 			grid.draw();
 			particles.draw();
 			FlxG.camera.screen.pixels.draw(FlxG.flashGfxSprite);
 			
 			super.draw();
 			
+			//Apply glow effect, may cause significant framerate decrease
 			_fx.stamp(FlxG.camera.screen);
 			FlxG.camera.screen.pixels.applyFilter(FlxG.camera.screen.pixels, _rect, _point, blur);
 			_fx.draw();

@@ -41,8 +41,6 @@ package
 		override public function draw():void
 		{
 			super.draw();
-			//FlxG.camera.screen.drawLine(position.x - 2, position.y - 2, position.x + 2, position.y + 2, 0xff0000, 2);
-			//FlxG.camera.screen.drawLine(position.x - 2, position.y + 2, position.x + 2, position.y - 2, 0xff0000, 2);
 		}
 		
 		override public function update():void
@@ -168,11 +166,13 @@ package
 		private function exhaust():void
 		{
 			var t:Number = getTimer();
+			
 			// The primary velocity of the particles is 3 pixels/frame in the direction opposite to which the ship is travelling.
 			_point.x = -velocity.x;
 			_point.y = -velocity.y;
 			GameInput.normalize(_point);
 			var _speed:Number = 120 + 60 * FlxG.random();
+			
 			// Calculate the sideways velocity for the two side streams. The direction is perpendicular to the ship's velocity and the
 			// magnitude varies sinusoidally.
 			var _angle:Number = (45 + 15 * FlxG.random()) * Math.sin(0.01 * t);
@@ -183,7 +183,6 @@ package
 			
 			// middle particle stream
 			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180, _speed, _midColor, true);
-			//ScreenState.makeGlow(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180, 180, _midColor);
 			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180 + _angle, _speed, _sideColor);
 			ScreenState.makeParticle(Particle.ENEMY, _exhaustX, _exhaustY, angle + 180 - _angle, _speed, _sideColor);
 		}

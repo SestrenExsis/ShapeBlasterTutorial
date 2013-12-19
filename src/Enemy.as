@@ -22,7 +22,6 @@ package
 		{
 			super(FlxG.width * FlxG.random(), FlxG.height * FlxG.random());
 			
-			//_type = WANDERER;
 			enemyPixels.push(loadRotatedGraphic(imgSeeker, 360, -1, true, true).pixels);
 			enemyPixels.push(loadRotatedGraphic(imgWanderer, 360, -1, true, true).pixels);
 			enemyPixels.push(loadRotatedGraphic(imgBlackHole, 360, -1, true, true).pixels);
@@ -31,11 +30,10 @@ package
 			
 			radius = 20;
 			hitboxRadius = 18;
-			maxVelocity.x = maxVelocity.y = 300;//384;
+			maxVelocity.x = maxVelocity.y = 300;
 			
 			alive = false;
 			exists = false;
-			//have a separate playerCollision radius, a bulletCollision radius, and an enemyCollision radius
 		}
 		
 		override public function draw():void
@@ -129,11 +127,13 @@ package
 		{
 			var _previousType:uint = _type;
 			_type = Value;
+			// Change the pixel BitmapData if the type changed
 			if (_previousType != _type)
 			{
 				_pixels = enemyPixels[_type];
 				dirty = true;
 			}
+			
 			switch (_type)
 			{
 				case SEEKER:
@@ -224,7 +224,6 @@ package
 		
 		private function applyBehaviors():void
 		{
-			//behavior logic goes here
 			if (type == SEEKER) followPlayer();
 			else if (type == WANDERER) moveRandomly();
 			else if (type == BLACK_HOLE) applyGravity();
@@ -268,41 +267,6 @@ package
 		private function applyGravity(Acceleration:Number = 320):void
 		{
 			angularVelocity = 200;
-		}
-		
-		private function moveInASquare():void
-		{
-			/*const int framesPerSide = 30;
-			while (true)
-			{
-				// move right for 30 frames
-				for (int i = 0; i < framesPerSide; i++)
-				{
-					Velocity = Vector2.UnitX;
-					yield return 0;
-				}
-		
-				// move down
-				for (int i = 0; i < framesPerSide; i++)
-				{
-					Velocity = Vector2.UnitY;
-					yield return 0;
-				}
-		
-				// move left
-				for (int i = 0; i < framesPerSide; i++)
-				{
-					Velocity = -Vector2.UnitX;
-					yield return 0;
-				}
-		
-				// move up
-				for (int i = 0; i < framesPerSide; i++)
-				{
-					Velocity = -Vector2.UnitY;
-					yield return 0;
-				}
-			}*/
 		}
 	}
 }
